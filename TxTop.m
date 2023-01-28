@@ -32,6 +32,7 @@ classdef TxTop
             outputTx = sqrt(obj.SettingsTx.PTX) .* chirp_tx;
             if (PLOT_TX == true)
                 %%% Ploteo de Tx
+                figure
                 subplot(3,1,1);
                 plot(tline, obj.CHIRP_SLOPE.*tline);
                 subplot(3,1,2);
@@ -40,6 +41,7 @@ classdef TxTop
                 N_FFT = 4096;
                 fvec = (0:N_FFT-1)*(3*2e9/N_FFT);
                 plot(fvec,abs(fft(outputTx,N_FFT)).^2);
+                title("TX")
             end
         end
     end

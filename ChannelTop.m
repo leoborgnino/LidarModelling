@@ -23,9 +23,9 @@ classdef ChannelTop
                 fileID = fopen('data/data_channel.txt','r');
                 formatSpec = "%f,%f";
                 scan = textscan(fileID,formatSpec);
-                scan = cell2mat(scan)
-                range = scan(1,1)
-                rho = scan(1,2)
+                scan = cell2mat(scan);
+                range = scan(1,1); %% Cambiar despues
+                rho = scan(1,2);
             else
                 range = 1; %m Rango, luego del canal
                 rho = 1; % Reflectividad, luego del canal                                
@@ -47,6 +47,7 @@ classdef ChannelTop
                 plot(tline,tx_signal);
                 hold all
                 plot(tline,ch_out);
+                title("CHANNEL")
             end
             outputCh = ch_out;
         end

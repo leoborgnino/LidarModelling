@@ -31,7 +31,6 @@ classdef RxTop
             wait_samples = ceil(obj.T_WAIT*obj.SettingsRx.FS);
             noise_power = 1.6e-19/obj.SettingsRx.RPD * obj.SettingsRx.FS;
             
-            
             %%%%%%%% TEORIA
 %             prx_theo = PTX*power_gain %%% NO IRIA 
 %             theo_snr = prx_theo*T_MEAS/(Q_ELECT/RPD);
@@ -49,10 +48,9 @@ classdef RxTop
                 plot(tline, real(detector_out_noiseless))
                 plot(tline, real(noise))    
                 plot(tline, real(detector_out))
+                title("Ruido del Detector")
             end
-            
-            f_vec = (0:obj.NFFT-1)*(obj.SettingsRx.FS/obj.NFFT);
-   
+               
             %%% DSP
             dsp_input = detector_out(1+wait_samples:end);
             prx_measured = mean(abs(dsp_input).^2);
@@ -61,7 +59,9 @@ classdef RxTop
             y_mf = abs(fft(dsp_input,obj.NFFT)).^2;
             if (PLOT_RX)
                 figure
+                f_vec = (0:obj.NFFT-1)*(obj.SettingsRx.FS/obj.NFFT);
                 plot(f_vec,y_mf)
+                title("FFT RX")
             end
             outputRx = y_mf;
         end

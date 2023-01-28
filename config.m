@@ -2,7 +2,7 @@
 
 %%% Transmisor Tx
 
-SettingsTx = struct('PTX'        ,           100e-3, ... % Watts
+SettingsTx = struct('PTX'        ,           50e-3, ... % Watts
                     'CHIRP_BW'   ,             2e9, ... % Hz
                     'MAX_RANGE'  ,             300, ... % m
                     'Q_ELECT'    ,         1.6e-19, ... %C
