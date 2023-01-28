@@ -5,9 +5,11 @@ config
 
 import TxTop;
 import RxTop;
+import ChannelTop;
 
 Transmitter = TxTop(SettingsTx);
 Receptor = RxTop(SettingsRx, SettingsTx.T_MEAS, Transmitter.T_WAIT);
+Channel = ChannelTop(SettingsRx.ARX,SettingsRx.FS,SettingsRx.LAMBDA0);
 
 %% Simulacion
 T_SIM = ceil(Transmitter.T_0*SettingsRx.FS); % Tiempo total de la simulación
@@ -18,28 +20,13 @@ PLOT_TX = true
 tx_signal = Transmitter.ProcessTx(tline, PLOT_TX)
 
 %% Canal: Lee datos
-range = 1; %m Rango, luego del canal
-rho = 1; % Reflectividad, luego del canal
-%%% Canal
-tau = 2*range/3e8;
-delay_samples = round(tau*SettingsRx.FS);
-real_tau = delay_samples*(1/SettingsRx.FS);
-real_range = real_tau*3e8/2;
- 
-power_gain = rho*SettingsRx.ARX/(4*pi*real_range.^2);
-delta_phase = 3e8/SettingsRx.LAMBDA0.*real_tau;
-
-ch_out = sqrt(power_gain) .* [zeros(delay_samples,1); tx_signal(1:end-delay_samples)] .* exp(-1j*delta_phase);
-
-figure
-plot(tline,tx_signal);
-hold all
-plot(tline,ch_out);
+PLOT_CH = true
+READ_FROM_FILE = true
+ch_out = Channel.ProcessChannel(tline,tx_signal,READ_FROM_FILE,PLOT_CH);
 
 %% RX
 PLOT_RX = true
 output_rx = Receptor.ProcessRx(tline,ch_out,tx_signal,PLOT_RX);
-
 
 % 
 % %% Receptor
