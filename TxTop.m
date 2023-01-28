@@ -3,31 +3,44 @@ classdef TxTop
     %   Detailed explanation goes here
     
     properties
-        PTX = 50e-3; %W
-        CHIRP_BW = 2e9; %Hz
-        MAX_RANGE = 300; %m
-        Q_ELECT= 1.6e-19; %C
-        T_MEAS = 5e-6; %s
+        SettingsTx;
         T_WAIT;
         T_0;
         CHIRP_SLOPE;
     end
     
     methods
-        function obj = tx_top(PTX,CHIRP_BW)
-            %TX_TOP Construct an instance of this class
-            %   Detailed explanation goes here
-            obj.PTX = PTX;
-            obj.CHIRP_BW = CHIRP_BW;
-            obj.T_WAIT = 2*obj.MAX_RANGE/3e8; %s
-            obj.T_0 = obj.T_MEAS + obj.T_WAIT; %s Duracion entera del chirp
-            obj.CHIRP_SLOPE =  obj.CHIRP_BW/obj.T_0; % gamma
+        function obj = TxTop(SettingsTx)
+            % TX_TOP Constructor
+            %   Asigna las configuraciones de Tx
+            %   Calcula T wait como 2xMAXRANGE
+            %   Calcula T0 como la suma entre TWAIT y TMEAS
+            %   Calcula gamma como el ancho de banda del chirp sobre el
+            %   tiempo total de chirp T0
+            obj.SettingsTx  = SettingsTx;
+            obj.T_WAIT      = 2*obj.SettingsTx.MAX_RANGE/3e8; % s
+            obj.T_0         = obj.SettingsTx.T_MEAS + obj.T_WAIT; %s Duracion entera del chirp
+            obj.CHIRP_SLOPE = obj.SettingsTx.CHIRP_BW/obj.T_0;  % gamma
+
          end
         
-        function outputArg = method1(obj,datapath)
-            %METHOD1 Summary of this method goes here
-            %   Detailed explanation goes here
-            outputArg = obj.PTX + obj.CHIRP_BW;
+        function outputTx = ProcessTx(obj, tline, PLOT_TX)
+            % ProcessTx
+            %   Genera el chirp del Tx
+            %% Transmisor
+            chirp_tx = exp(1j.*pi*obj.CHIRP_SLOPE.*tline.^2); % Chirp en el tiempo total de simulacion
+            outputTx = sqrt(obj.SettingsTx.PTX) .* chirp_tx;
+            if (PLOT_TX == true)
+                %%% Ploteo de Tx
+                subplot(3,1,1);
+                plot(tline, obj.CHIRP_SLOPE.*tline);
+                subplot(3,1,2);
+                plot(tline, outputTx);
+                subplot(3,1,3);
+                N_FFT = 4096;
+                fvec = (0:N_FFT-1)*(3*2e9/N_FFT);
+                plot(fvec,abs(fft(outputTx,N_FFT)).^2);
+            end
         end
     end
 end
