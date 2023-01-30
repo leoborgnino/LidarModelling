@@ -17,23 +17,10 @@ classdef ChannelTop
             obj.LAMBDA0 = LAMBDA0;
         end
         
-        function outputCh = ProcessChannel(obj,tline,tx_signal,READ_FROM_FILE,PLOT_CH)
-            
-            if (READ_FROM_FILE)
-                fileID = fopen('data/data_channel.txt','r');
-                formatSpec = "%f,%f";
-                scan = textscan(fileID,formatSpec);
-                scan = cell2mat(scan);
-                range = scan(1,1); %% Cambiar despues
-                rho = scan(1,2);
-            else
-                range = 1; %m Rango, luego del canal
-                rho = 1; % Reflectividad, luego del canal                                
-            end
-            
+        function outputCh = ProcessChannel(obj,tline,tx_signal,range, rho,PLOT_CH)            
             %%% Canal
             tau = 2*range/3e8;
-            delay_samples = round(tau*obj.FS);
+            delay_samples = round(tau*obj.FS)
             real_tau = delay_samples*(1/obj.FS);
             real_range = real_tau*3e8/2;
 
