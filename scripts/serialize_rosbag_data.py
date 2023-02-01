@@ -33,15 +33,14 @@ with Reader('../data/rosbag2_2023_01_29-17_21_07') as reader:
     flag = 0
     for connection, timestamp, rawdata in reader.messages():
         if connection.topic == '/carla/ego_vehicle/lidar2':
-            if (flag == 0):
-                msg = deserialize_cdr(rawdata, connection.msgtype)                
-                header_rosbag = msg.header
-                header = Header()
-                timestamp = Time()
-                timestamp.sec = header_rosbag.stamp.sec
-                timestamp.sec = header_rosbag.stamp.nanosec
-                header.stamp = timestamp
-                header.frame_id = header_rosbag.frame_id
+            msg = deserialize_cdr(rawdata, connection.msgtype)                
+            header_rosbag = msg.header
+            header = Header()
+            timestamp2 = Time()
+            timestamp2.sec = header_rosbag.stamp.sec
+            timestamp2.nanosec = header_rosbag.stamp.nanosec
+            header.stamp = timestamp2
+            header.frame_id = header_rosbag.frame_id
             points = []
             for i in matrix_data_from_matlab:
                 dist = float(i[0])
@@ -62,7 +61,6 @@ with Writer('../data/rosbag_'+current_time) as writer:
     topic_write = '/carla/ego_vehicle/lidar2_processed'
     msgtype = PointCloud2_rosbags.__msgtype__
     conection = writer.add_connection(topic_write, msgtype, 'cdr', '')
-
     for i in range(len(msgs_processed)):
         message       = msgs_processed[i]
         stamp_rosbag  = Time_rosbags(sec=message.header.stamp.sec,nanosec=message.header.stamp.nanosec)
@@ -76,5 +74,5 @@ with Writer('../data/rosbag_'+current_time) as writer:
         timestamp = timestamp_rosbag[i]
         #print(timestamp)
         serialized = serialize_cdr(message_rosbag, msgtype)
-        writer.write(conection, timestamp.sec, serialized)
+        writer.write(conection, timestamp, serialized)
 
