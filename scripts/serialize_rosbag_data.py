@@ -13,27 +13,32 @@ from std_msgs.msg import Header
 from builtin_interfaces.msg import Time
 import math
 from datetime import datetime
+import os
+
+datapath_read = '../data/rosbag2_2023_01_29-17_21_07'
+datapath_read_matlab = '../data/data_from_ros_15:30:42_matlab'
+list_files = os.listdir(datapath_read_matlab)
+list_files.sort(reverse=True)
 
 # create reader instance and open for reading
-with Reader('../data/rosbag2_2023_01_29-17_21_07') as reader:
+with Reader(datapath_read) as reader:
     # topic and msgtype information is available on .connections list
     for connection in reader.connections:
         print(connection.topic, connection.msgtype)
 
     # iterate over messages
-    file_lidar_processed = open('../data/data_from_matlab.log','r')
-    lines_lidar_processed = file_lidar_processed.readlines()
-    matrix_data_from_matlab = []
-    for i in lines_lidar_processed:
-        matrix_data_from_matlab.append(i.replace('\n','').split(' '))
-
     timestamp_rosbag = []
     msgs_processed = []
     msgs_rosbag = []
-    flag = 0
+    msgs_original = []
+    #flag = 0
     for connection, timestamp, rawdata in reader.messages():
         if connection.topic == '/carla/ego_vehicle/lidar2':
-            msg = deserialize_cdr(rawdata, connection.msgtype)                
+            # Get data from rosbag
+            msg = deserialize_cdr(rawdata, connection.msgtype)
+            #if (flag == 0):
+            #    msg_stacked = msg
+            #    flag = 1
             header_rosbag = msg.header
             header = Header()
             timestamp2 = Time()
@@ -42,24 +47,45 @@ with Reader('../data/rosbag2_2023_01_29-17_21_07') as reader:
             header.stamp = timestamp2
             header.frame_id = header_rosbag.frame_id
             points = []
-            for i in matrix_data_from_matlab:
-                dist = float(i[0])
-                elev = float(i[3])
-                azim = float(i[4])
-                x = dist * ( math.cos( elev ) * math.sin( azim ) )
-                y = dist * ( math.cos( elev ) * math.cos( azim ) )
-                z = dist * math.sin( elev )
-                points.append([x,y,z])
+            # Transform from files to msg
+            try:
+                file_lidar_matlab_name = list_files.pop()
+                # '../data/data_from_matlab.log'
+                file_lidar_processed = open(datapath_read_matlab+'/'+file_lidar_matlab_name,'r')
+                lines_lidar_processed = file_lidar_processed.readlines()
+                matrix_data_from_matlab = []
+                for i in lines_lidar_processed:
+                    matrix_data_from_matlab.append(i.replace('\n','').split(' '))
 
-            msgs_processed.append(point_cloud2.create_cloud_xyz32(header,points))
-            timestamp_rosbag.append(timestamp)
+                for i in matrix_data_from_matlab:
+                    dist = float(i[0])
+                    azim = float(i[3])
+                    elev = float(i[4])
+                    x = dist * ( math.cos( elev ) * math.sin( azim ) )
+                    y = dist * ( math.cos( elev ) * math.cos( azim ) )
+                    z = dist * math.sin( elev )
+                    points.append([x,y,z])
+
+                msgs_processed.append(point_cloud2.create_cloud_xyz32(header,points))
+                msgs_original.append(msg)
+                timestamp_rosbag.append(timestamp)
+            except:
+                pass
                 
 # create reader instance and open for writting
 now = datetime.now()
 current_time = now.strftime("%H:%M:%S")
 with Writer('../data/rosbag_'+current_time) as writer:
     topic_write = '/carla/ego_vehicle/lidar2_processed'
+    topic_write_original = '/carla/ego_vehicle/lidar2_original'
     msgtype = PointCloud2_rosbags.__msgtype__
+    conection = writer.add_connection(topic_write_original, msgtype, 'cdr', '')
+    for i in range(len(msgs_processed)):
+        timestamp = timestamp_rosbag[i]
+        #print(timestamp)
+        serialized = serialize_cdr(msgs_original[i], msgtype)
+        writer.write(conection, timestamp, serialized)
+
     conection = writer.add_connection(topic_write, msgtype, 'cdr', '')
     for i in range(len(msgs_processed)):
         message       = msgs_processed[i]
