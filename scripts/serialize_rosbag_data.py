@@ -14,6 +14,9 @@ from builtin_interfaces.msg import Time
 import math
 from datetime import datetime
 import os
+import matplotlib.pyplot as plt
+
+DEBUG = False
 
 datapath_read = '../data/rosbag2_2023_01_29-17_21_07'
 datapath_read_matlab = '../data/data_from_ros_15:30:42_matlab'
@@ -47,6 +50,12 @@ with Reader(datapath_read) as reader:
             header.stamp = timestamp2
             header.frame_id = header_rosbag.frame_id
             points = []
+            # debug
+            if (DEBUG == True):
+                xs = []
+                ys = []
+                zs = []
+                distances = []
             # Transform from files to msg
             try:
                 file_lidar_matlab_name = list_files.pop()
@@ -64,6 +73,12 @@ with Reader(datapath_read) as reader:
                     x = dist * ( math.cos( elev ) * math.sin( azim ) )
                     y = dist * ( math.cos( elev ) * math.cos( azim ) )
                     z = dist * math.sin( elev )
+                    if(DEBUG == True):
+                        if (dist > 500):
+                            distances.append(dist)
+                        xs.append(x)
+                        ys.append(y)
+                        zs.append(z)
                     points.append([x,y,z])
 
                 msgs_processed.append(point_cloud2.create_cloud_xyz32(header,points))
@@ -102,3 +117,12 @@ with Writer('../data/rosbag_'+current_time) as writer:
         serialized = serialize_cdr(message_rosbag, msgtype)
         writer.write(conection, timestamp, serialized)
 
+if (DEBUG == True):
+    plt.hist(distances)
+    plt.show()
+    plt.hist(xs)
+    plt.show()
+    plt.hist(ys)
+    plt.show()
+    plt.hist(zs)
+    plt.show()
