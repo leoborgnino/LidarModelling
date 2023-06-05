@@ -4,7 +4,7 @@ close all;
 config
 
 import TxTopPulsed;
-import RxTop;
+import RxTopPulsed;
 import ChannelTop;
 
 %%%% Transmisor
@@ -14,7 +14,7 @@ Transmitter = TxTopPulsed(SettingsTxPulsed);
 Channel = ChannelTop(SettingsRx.ARX,SettingsRx.FS,SettingsRx.LAMBDA0);
 
 %%%% Receptor
-Receptor = RxTop(SettingsRx, SettingsTx.T_MEAS, 100);
+Receptor = RxTopPulsed(SettingsRx, SettingsTx.T_MEAS, 100);
 
 %%  Parámetros Simulacion
 F_PULSE = 1e6 % Hz
@@ -35,7 +35,7 @@ N_FRAMES = 5;                                    % Número de frames a procesar 
 
 %%% RX
 WRITE_TO_FILE = false;                       % Escribir datos procesados
-PLOT_RX = false;
+PLOT_RX = true;
 PLOT_LOG = true;
 LOG_RX = false;
 
@@ -82,7 +82,7 @@ if (READ_FROM_FILE)
             %%% Procesamiento del canal
             ch_out = Channel.ProcessChannel(tline,tx_signal,range(i),rho(i),PLOT_CH);
             %%% Receptor
-            [output_rx,f_vec] = Receptor.ProcessRx(tline,ch_out,tx_signal,PLOT_RX);
+            [output_rx,f_vec] = Receptor.ProcessRx(tline,ch_out,1,PLOT_RX);
             [max_value,max_idx] = max(output_rx);
             %%% Post Procesamiento datos del Receptor
             max_fft = [max_fft max_idx];
