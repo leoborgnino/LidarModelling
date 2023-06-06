@@ -19,6 +19,7 @@ classdef TxTopPulsed
             if (PLOT_TX)
                figure
                plot(tline,x_t)
+	       title("TX")
             end
             outputTxPulsed = x_t;
         end

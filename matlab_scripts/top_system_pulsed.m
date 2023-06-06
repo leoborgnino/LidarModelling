@@ -31,12 +31,12 @@ PLOT_CH = true;
 LOG_CH = false;
 READ_FROM_FILE = true;                             % Leer de la base de datos del simulador 3D
 DATAPATH_CARLA = '../data/data_from_ros_15:30:42'; % path a los datos del simulador 3D
-N_FRAMES = 5;                                    % Número de frames a procesar (end para todos)
+N_FRAMES = 1;                                    % Número de frames a procesar (end para todos)
 
 %%% RX
 WRITE_TO_FILE = false;                       % Escribir datos procesados
 PLOT_RX = true;
-PLOT_LOG = true;
+PLOT_LOG = false;
 LOG_RX = false;
 
 %%%%%%%%
@@ -78,7 +78,7 @@ if (READ_FROM_FILE)
         new_dist = [];
         
         %%% Recorre cada uno de los rangos
-        for i=1:size(range)
+        for i=1:1 %size(range)
             %%% Procesamiento del canal
             ch_out = Channel.ProcessChannel(tline,tx_signal,range(i),rho(i),PLOT_CH);
             %%% Receptor
@@ -87,7 +87,9 @@ if (READ_FROM_FILE)
             %%% Post Procesamiento datos del Receptor
             max_fft = [max_fft max_idx];
             max_freq = [max_freq f_vec(max_idx)];
-            dist = f_vec(max_idx)*(1/Transmitter.CHIRP_SLOPE)*3e8/2;
+	    max_idx
+	    floor(length(tline)/2)-max_idx
+            dist = ((floor(length(tline)/2)-max_idx)/SettingsRx.FS)*3e8/2
             new_dist = [new_dist dist];
         end
         
@@ -124,7 +126,6 @@ else
     new_dist = [];
     for i=1:size(range)
         ch_out = Channel.ProcessChannel(tline,tx_signal,range(i),rho(i),PLOT_CH);
-        Receptor.ProcessRx(tline,ch_out,tx_signal,PLOT_RX);
         [output_rx,f_vec] = Receptor.ProcessRx(tline,ch_out,tx_signal,PLOT_RX);
         [max_value,max_idx] = max(output_rx);
         max_fft = [max_fft max_idx];

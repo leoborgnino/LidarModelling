@@ -57,12 +57,16 @@ classdef RxTopPulsed
             %%% MF
 	    matched_filter = conj(data_input(end:-1:1));
             y_mf = conv(matched_filter,data_input,'same');
+	    length(y_mf)
 	    noise_mf = conv(matched_filter,noise,'same');
             f_vec = tline;
             if (PLOT_RX)
                 figure
                 plot(tline,y_mf)
-                title("FFT RX")
+                title("MF RX")
+		figure
+                plot(tline,y_mf)
+                title("NOISE RX")
             end
             outputRx = y_mf;
         end
