@@ -11,7 +11,7 @@ import ChannelTop;
 Transmitter = TxTop(SettingsTx);
 
 %%%% Canal
-Channel = ChannelTop(SettingsRx.ARX,SettingsRx.FS,SettingsRx.LAMBDA0);
+Channel = ChannelTop(SettingsRx.ARX,SettingsRx.FS,SettingsRx.LAMBDA0,false,SettingsTx.MAX_RANGE);
 
 %%%% Receptor
 Receptor = RxTop(SettingsRx, SettingsTx.T_MEAS, Transmitter.T_WAIT);

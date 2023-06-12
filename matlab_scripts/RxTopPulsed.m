@@ -5,20 +5,16 @@ classdef RxTopPulsed
     properties
         SettingsRx;
         T_MEAS;
-        T_WAIT;
         NCELLS;
-        NFFT;
     end
     
     methods
-        function obj = RxTopPulsed(SettingsRx, T_MEAS, T_WAIT)
+        function obj = RxTopPulsed(SettingsRx, T_MEAS)
             %RXTOP Construct an instance of this class
             %   Detailed explanation goes here
             obj.SettingsRx = SettingsRx;
             obj.T_MEAS     = T_MEAS;
-            obj.T_WAIT     = T_WAIT;
             obj.NCELLS     = SettingsRx.FS*obj.T_MEAS;
-            obj.NFFT       = ceil(8*obj.NCELLS);
         end
         
         function [outputRx, f_vec] = ProcessRx(obj, tline, data_input, PRX, PLOT_RX)
@@ -31,9 +27,11 @@ classdef RxTopPulsed
             noise_power = 1.6e-19/obj.SettingsRx.RPD * obj.SettingsRx.FS;
             
             %%%%%%%% TEORIA
-%             prx_theo = PTX*power_gain %%% NO IRIA 
+%             prx_theo = entrada*power_gain %%% NO IRIA 
 %             theo_snr = prx_theo*T_MEAS/(Q_ELECT/RPD);
 %             theo_snr_dB = 10*log10(theo_snr)
+
+	    % AFE
             detector_out_noiseless = data_input*PRX;
             dsp_input_noiseless = detector_out_noiseless;
             prx_measured_noiseless = mean(abs(dsp_input_noiseless).^2);
@@ -42,12 +40,14 @@ classdef RxTopPulsed
             detector_out = detector_out_noiseless + noise;
             
             if (PLOT_RX)
-                figure
-                hold all
-                plot(tline, real(detector_out_noiseless))
-                plot(tline, real(noise))    
-                plot(tline, real(detector_out))
-                title("Ruido del Detector")
+	        figure
+                subplot(2,1,1)
+                plot(abs(detector_out_noiseless))
+		title("Entrada al detector")
+		%plot(tline, real(noise))
+                subplot(2,1,2)
+                plot(abs(detector_out))
+                title("Salida AFE")
             end
                
             %%% DSP
@@ -56,19 +56,19 @@ classdef RxTopPulsed
             
             %%% MF
 	    matched_filter = conj(data_input(end:-1:1));
-            y_mf = conv(matched_filter,data_input,'same');
-	    length(y_mf)
-	    noise_mf = conv(matched_filter,noise,'same');
+            y_mf = conv(matched_filter,detector_out);
+	    noise_mf = conv(matched_filter,noise);
             f_vec = tline;
             if (PLOT_RX)
-                figure
-                plot(tline,y_mf)
-                title("MF RX")
-		figure
-                plot(tline,y_mf)
-                title("NOISE RX")
+	      figure
+              subplot(2,1,1)
+              plot(abs(noise_mf))
+              title("NOISE RX")
+              subplot(2,1,2)
+              plot(abs(y_mf))
+              title("MF RX")
             end
-            outputRx = y_mf;
+            outputRx = abs(y_mf);
         end
     end
 end
