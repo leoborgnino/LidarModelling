@@ -9,16 +9,15 @@
 
 <div align="center">
 
-# Lidar C++ Model for Autonomous Driving Simulation
+# Lidar Matlab Model for Autonomous Driving Simulation
 
-[![pipeline status](https://gitlab.com/leoborgnino/lidar-pcm/badges/master/pipeline.svg)](https://gitlab.com/leoborgnino/lidar-pcm/-/commits/master)
+[![pipeline status](https://gitlab.com/leoborgnino/lidar-systems-level/badges/master/pipeline.svg)](https://gitlab.com/leoborgnino/lidar-systems-level/-/commits/master)
 
-Lidar C++ Model for UE4 models a LiDAR sensor that can be integrated in UE4 environments(i.e CARLA).
+Lidar Matlab Model for Carla data processing.
 
 [Introducción](# Introducción) •
 [Instalación](# Instalación) •
-[Configuración](# Configuración) •
-[Integración con UE4](# UE4Integration)
+[Uso](# Uso) •
 
 </div>
 
