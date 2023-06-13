@@ -1,21 +1,17 @@
 {    
     "global"                                : {
         "SEED"                              : 654321,
-        "VM_ON"                             : 0,
-	"MODULATION"                        : "QPSK",
-        "LDPC_ON"                           : 0,
-        "CODE_RATE"                         : "4/5",/* 4/5, 1/2*/
-        "INITIAL_OFFSET"                    : "pi/4", /*CAMBIAR POR INITIAL_SYMBOL_OFFSET*/
-        "SNR"                               : [20],/*[4,5,6,7,8,9,10,11,12,13,14,15], /*[15,14,13,12,11,10,9,8,7,6,5,4],*/
-	"OFFSET_FRECUENCY"                  : 0.5e6,
-	"SYMBOL_FRECUENCY"                  : 128000
+        "VM_ON"                             : 0
     },
     
     "TxLidarPulsed"       : {
-        "FS"              : 3e8,
-        "LEN_TOTAL"       : 64,
-        "DATA_BUFFER_LEN" : 8,
-        "N_COEFF"         : 512
+        "PTX"             : 50e-3,   // Potencia del Transmisor [Watts]
+        "TAU_SIGNAL"      : 5e-9,    // Duración del pulso [s]
+        "LAMBDA0"         : 950e-9,  // Lambda del láser [m]
+	"MAX_RANGE"       : 300,     // Rángo Máximo [m]
+        "Q_ELECT"         : 1.6e-19, // Carga Eléctrica [C] 
+	"FS"              : 2e9,     // Frecuencia de Muestreo [Hz]
+	"NOS"             : 5        // Sobremuestreo [Veces]
     }
    
 }
