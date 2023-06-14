@@ -34,27 +34,13 @@ Este proyecto se desarrolloó en Fundación Fulgor y el objetivo es conectar el 
 1. **Clonar Repositorio**
 
    ```bash 
-   git clone https://gitlab.com/leoborgnino/lidar-pcm
+   git clone https://gitlab.com/leoborgnino/lidar-systems-level
    ```
-
-
-2. **Instalar SystemC-2.3.3**
-
-    ```bash
-    wget https://www.accellera.org/images/downloads/standards/systemc/systemc-2.3.3.tar.gz
-    tar -xvf systemc-2.3.3.tar.gz
-    cd systemc-2.3.3
-    mkdir objdir
-    cd objdir
-    ../configure
-    cmake ..
-    make install
-    ```
   
-3. **Compilar y realizar tests de verificación** <sup>(optional)</sup>
+2. **Compilar y realizar tests de verificación** <sup>(optional)</sup>
 
    ```bash
-    cd src/
+    cd cpp_simulator/src/
     cmake .
     make 
     ./LidarCPP
