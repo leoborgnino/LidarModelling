@@ -49,7 +49,7 @@ vector<double> ChannelLidar::run(vector<double> channel_input, double range, dou
   double meas_range = meas_delay*LIGHT_SPEED/2;
 
   double power_gain  = cos(angle_inc)*rho*ARX/(4*PI*pow(meas_range,2));
-  double delta_phase = LIGHT_SPEED/LAMBDA0*meas_delay;
+  //double delta_phase = LIGHT_SPEED/LAMBDA0*meas_delay;
 
   cout << "Channel Power Gain: " << power_gain << endl;
 
@@ -60,7 +60,7 @@ vector<double> ChannelLidar::run(vector<double> channel_input, double range, dou
 	    [&power_gain](double element) { return element *= sqrt(power_gain); });
 
   // Desplazamiento según el retardo
-
+  // Warning: Posible bug porque es un shift circular
   rotate(channel_output.begin(), channel_output.begin()+channel_output.size()-delay_samples, channel_output.end());
   
   // Warning: Faltaría el desplazamiento de la fase por ahora solo real

@@ -29,6 +29,9 @@ using namespace std;
 // Channel
 #include "ChannelLidar.h"
 
+// Rx
+#include "RxLidarPulsed.h"
+
 // Utils
 #include "Logger.h"
 
@@ -70,33 +73,46 @@ int main (int argc, char *argv[])
 
   Logger * logger = new Logger();
 
-  ////////////////////////////////
-  // :::::::: Tx LiDAR :::::::: //
-  ////////////////////////////////
-  
-  vector<double> output_tx;
-  
+  ///////////////////////////////////////////
+  // :::::: Objetos del Transceptor :::::: //
+  ///////////////////////////////////////////
+    
   TxLidarPulsed * tx_lidar = new TxLidarPulsed();
   tx_lidar->init             (     params      );
 
-  output_tx = tx_lidar->run();
+  ChannelLidar * channel_lidar = new ChannelLidar();
+  channel_lidar->init        (     params      );
+    
+  RxLidarPulsed * rx_lidar = new RxLidarPulsed();
+  rx_lidar->init             (     params      );
+  
+  ////////////////////////////////
+  // :::::::: Tx LiDAR :::::::: //
+  ////////////////////////////////
 
+  vector<double> output_tx;
+  output_tx = tx_lidar->run();
   if ( params->getParamAsInt(string("global.LOG_TX")))
     logger->logVariable("logs/tx_output.log",output_tx);
-  
+
   ///////////////////////////////
   // :::::::: Channel :::::::: //
   ///////////////////////////////
-
+  
   vector<double> output_channel;
-
-  ChannelLidar * channel_lidar = new ChannelLidar();
-  channel_lidar->init           (     params      );
-
   output_channel = channel_lidar->run(output_tx,1,1,0); // Warning Data from Simulator
-
   if ( params->getParamAsInt(string("global.LOG_CHANNEL")))
     logger->logVariable("logs/channel_output.log",output_channel);
 
-    
+  ////////////////////////////////
+  // :::::::: Rx LiDAR :::::::: //
+  ////////////////////////////////
+  
+  vector<double> output_rx;  
+  output_rx = rx_lidar->run(output_channel);
+  if ( params->getParamAsInt(string("global.LOG_RX")))
+    logger->logVariable("logs/rx_output.log",output_rx);
+
+
+  
 }
