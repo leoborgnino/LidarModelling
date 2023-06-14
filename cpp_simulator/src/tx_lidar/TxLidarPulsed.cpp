@@ -30,18 +30,12 @@ TxLidarPulsed::~TxLidarPulsed(){};
 /*----------------------------------------------------------------------------*/
 int  TxLidarPulsed::init(loadSettings *params){
     /*!Se utiliza para realizar la carga de parametros y la configuracion 
-      inicial de las variables*/
-    
-    //code_rate           = params->getParamAsString(string("global.CODE_RATE"));
-
+      inicial de las variables*/    
     MAX_RANGE = params->getParamAsInt(string("global.MAX_RANGE"));
     TAU_SIGNAL = params->getParamAsDouble(string("TxLidarPulsed.TAU_SIGNAL"));
     FS = params->getParamAsDouble(string("TxLidarPulsed.FS"));
     NOS = params->getParamAsInt(string("TxLidarPulsed.NOS"));
-    POWER_TX = params->getParamAsDouble(string("TxLidarPulsed.PTX"));
-    //Registra sus variables en la refTable
-    exposeVar();
-    
+    POWER_TX = params->getParamAsDouble(string("TxLidarPulsed.PTX"));    
     return 0;
 };
 

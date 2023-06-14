@@ -1,11 +1,11 @@
 /*-----------------------------------------------------------------------------
-  -- Proyecto      : Lidar PCM
+  -- Proyecto      : LiDAR Pulsado C++
   -------------------------------------------------------------------------------
-  -- Archivo       : TxLidarPulsed.h
+  -- Archivo       : ChannelLidar.h
   -- Organizacion  : Fundacion Fulgor
   -- Fecha         : 13 de Junio 2023
   -------------------------------------------------------------------------------
-  -- Descripcion   : Transmisor de LiDAR Pulsado
+  -- Descripcion   : Canal de LiDAR Pulsado
   -------------------------------------------------------------------------------
   -- Autor         : Leandro Borgnino
   -------------------------------------------------------------------------------
@@ -14,8 +14,8 @@
   -- $Id$
   -------------------------------------------------------------------------------*/
 
-#ifndef TxLidarPulsed_H
-#define TxLidarPulsed_H
+#ifndef ChannelLidar_H
+#define ChannelLidar_H
 
 // Includes common C++
 #include <fstream>
@@ -23,9 +23,10 @@
 #include <iostream>
 #include <stdlib.h> 
 #include <ctime>
-#include <math.h>
+#include <cmath>
 #include <map>
 #include <complex>
+#include <algorithm>
 
 // Includes Propios
 #include "constants.h"
@@ -34,28 +35,28 @@
 using namespace std;
 
 /*----------------------------------------------------------------------------*/
-class TxLidarPulsed
+class ChannelLidar
 {
   /*-----------------------------------------------------------------------*/
-public:
-  TxLidarPulsed();
-  ~TxLidarPulsed();
-
+ public:
+  ChannelLidar();
+  ~ChannelLidar();
+  
   /**El metodo init, utiliza la clase loadSettings para determinar los valores de las
      variables que utiliza. */
   int init(loadSettings *params);
-  vector<double> run();    
-
+  vector<double> run(vector<double> channel_input, double range, double rho, double angle_inc); 
+  
   // Interfaces
-  vector <double> out_bits;
-
+  vector <double> out_channel;
+  
   /*-----------------------------------------------------------------------*/
-private:
+ private:
   void exposeVar();
-
+  
   // Params
-  int MAX_RANGE,NOS;
-  double TAU_SIGNAL, FS, POWER_TX;
+  double ARX, FS, LAMBDA0;
+  int NOS;
   
   // Variables
 

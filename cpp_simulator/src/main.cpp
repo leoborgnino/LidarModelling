@@ -25,6 +25,11 @@ using namespace std;
 
 // Tx
 #include "TxLidarPulsed.h"
+
+// Channel
+#include "ChannelLidar.h"
+
+// Utils
 #include "Logger.h"
 
 /****************
@@ -49,17 +54,26 @@ void print_start_message()
 int main (int argc, char *argv[])
 {
 
-  //:::::::: Lectura de Parametros :::::::: //
+  /////////////////////////////////////////////
+  // :::::::: Lectura de Parametros :::::::: //
+  /////////////////////////////////////////////
+
   char path_to_settings[] = "../conf/dutConfig.json";
   loadSettings *params = new loadSettings(path_to_settings);
 
   print_start_message();
   params->exposeJson();
 
-  //:::::::: Objetos de utilidad :::::::: //
+  ///////////////////////////////////////////
+  // :::::::: Objetos de utilidad :::::::: //
+  ///////////////////////////////////////////
+
   Logger * logger = new Logger();
 
-  //:::::::: Tx LiDAR :::::::: //
+  ////////////////////////////////
+  // :::::::: Tx LiDAR :::::::: //
+  ////////////////////////////////
+  
   vector<double> output_tx;
   
   TxLidarPulsed * tx_lidar = new TxLidarPulsed();
@@ -69,7 +83,20 @@ int main (int argc, char *argv[])
 
   if ( params->getParamAsInt(string("global.LOG_TX")))
     logger->logVariable("logs/tx_output.log",output_tx);
-  // 
+  
+  ///////////////////////////////
+  // :::::::: Channel :::::::: //
+  ///////////////////////////////
+
+  vector<double> output_channel;
+
+  ChannelLidar * channel_lidar = new ChannelLidar();
+  channel_lidar->init           (     params      );
+
+  output_channel = channel_lidar->run(output_tx,1,1,0); // Warning Data from Simulator
+
+  if ( params->getParamAsInt(string("global.LOG_CHANNEL")))
+    logger->logVariable("logs/channel_output.log",output_channel);
 
     
 }
