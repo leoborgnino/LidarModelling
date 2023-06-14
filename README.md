@@ -9,15 +9,16 @@
 
 <div align="center">
 
-# Lidar Matlab Model for Autonomous Driving Simulation
+# Lidar C++ Model for Autonomous Driving Simulation
 
-[![pipeline status](https://gitlab.com/leoborgnino/lidar-systems-level/badges/master/pipeline.svg)](https://gitlab.com/leoborgnino/lidar-systems-level/-/commits/master)
+[![pipeline status](https://gitlab.com/leoborgnino/lidar-pcm/badges/master/pipeline.svg)](https://gitlab.com/leoborgnino/lidar-pcm/-/commits/master)
 
-Lidar Matlab Model for Carla data processing.
+Lidar C++ Model for UE4 models a LiDAR sensor that can be integrated in UE4 environments(i.e CARLA).
 
 [Introducción](# Introducción) •
 [Instalación](# Instalación) •
-[Uso](# Uso) •
+[Configuración](# Configuración) •
+[Integración con UE4](# UE4Integration)
 
 </div>
 
@@ -30,31 +31,35 @@ Este proyecto se desarrolloó en Fundación Fulgor y el objetivo es conectar el 
 
 
 
-1. **Instalar Matlab 2018**
+1. **Clonar Repositorio**
+
+   ```bash 
+   git clone https://gitlab.com/leoborgnino/lidar-pcm
+   ```
 
 
-2. **Instalar Python y las dependencias de ros2**
+2. **Instalar SystemC-2.3.3**
 
+    ```bash
+    wget https://www.accellera.org/images/downloads/standards/systemc/systemc-2.3.3.tar.gz
+    tar -xvf systemc-2.3.3.tar.gz
+    cd systemc-2.3.3
+    mkdir objdir
+    cd objdir
+    ../configure
+    cmake ..
+    make install
+    ```
+  
+3. **Compilar y realizar tests de verificación** <sup>(optional)</sup>
 
-## Uso
+   ```bash
+    cd src/
+    cmake .
+    make 
+    ./LidarCPP
+    ```
 
-1. Generar rosbag con CARLA 
-
-2. Desserializar los datos con el script deserialize_rosbag_data.py
-
-3. Procesar los datos con matlab lanzando el script top_system.m y top_system_pulsed.m
-
-4. Serializar los datos con serialize_rosbag_data.py
-
-5. ros2 bag play -l rosbag_pulsed_11:39:54.db3
-
-6. rviz2 . Fixed frame ego_vehicle/lidar2
-
-
-### Environment variables
-
-
-
+## Configuration
 
 [releases]: https://gitlab.com/leoborgnino/lidar-pcm/releases
-
