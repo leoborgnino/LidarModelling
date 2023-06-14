@@ -1,39 +1,31 @@
 import matplotlib.pyplot as plt
+import os
 
 PLOT_TX = True
 PLOT_CHANNEL = True
 PLOT_RX = True
 
-with open('./logs/tx_output.log') as f:
-    lines = f.readlines()
-    tx_signal = lines[0].split()
-    tx_signal = [float(ii) for ii in tx_signal]
-
-with open('./logs/channel_output.log') as f:
-    lines = f.readlines()
-    channel_signal = lines[0].split()
-    channel_signal = [float(ii) for ii in channel_signal]
-
-with open('./logs/rx_output.log') as f:
-    lines = f.readlines()
-    rx_signal = lines[0].split() 
-    rx_signal = [float(ii) for ii in rx_signal]
-   
-tline = [ii for ii in range(len(tx_signal))]
-plt.figure()
-plt.plot(tline,tx_signal)
-plt.savefig("debug0.png",dpi=500)
-plt.figure()
-plt.plot(tline,channel_signal)
-plt.savefig("debug1.png",dpi=500)
-plt.figure()
-plt.plot(tline,rx_signal)
-plt.savefig("debug2.png",dpi=500)
+def read_signal (name):
+    with open('./logs/'+name) as f:
+        lines = f.readlines()
+        signal = lines[0].split()
+        signal = [float(ii) for ii in signal]
+        return signal
 
 
-plt.figure()
-plt.plot(tline,tx_signal)
-plt.plot(tline,channel_signal)
-plt.plot(tline,rx_signal)
-plt.savefig("debug3.png",dpi=500)
+plot = ['tx_output','channel_output','rx_output']
 
+signals = []
+files = os.listdir('./logs')
+for i in plot:
+    signals_tmp = []
+    for j in files:
+        if i in j:
+            signals_tmp.append(read_signal(j))
+    signals.append(signals_tmp)
+
+for j in range(len(signals)):    
+    plt.figure()
+    for i in range(len(signals[1])):
+        plt.plot(signals[j][i][-20000:])
+    plt.savefig("debug"+str(j)+".png",dpi=500)

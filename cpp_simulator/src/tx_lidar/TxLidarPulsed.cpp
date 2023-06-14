@@ -42,6 +42,7 @@ int  TxLidarPulsed::init(loadSettings *params){
 /*----------------------------------------------------------------------------*/
 vector<double> TxLidarPulsed::run()
 {
+  out_bits.clear();
   int LEN_TOTAL = int((2*MAX_RANGE/LIGHT_SPEED)*FS*NOS); // Tiempo Máximo * Frecuencia de Muestreo * Sobremuestreo
   for (int i = 0; i<LEN_TOTAL; i++)
     if ( i < int(TAU_SIGNAL*FS*NOS) ) // Tiempo del pulso

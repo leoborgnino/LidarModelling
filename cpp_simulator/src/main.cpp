@@ -1,18 +1,18 @@
 /*-----------------------------------------------------------------------------
--- Proyecto      : Modelo Lidar C++
--------------------------------------------------------------------------------
--- Archivo       : main.cpp
--- Organizacion  : Fundacion Fulgor
--- Fecha         : 24 Octubre 2022
--------------------------------------------------------------------------------
--- Descripcion   : Main
--------------------------------------------------------------------------------
--- Autor         : Leandro Borgnino
--------------------------------------------------------------------------------
--- Copyright (C) 2023 Fundacion Fulgor  All rights reserved
--------------------------------------------------------------------------------
--- $Id: $
--------------------------------------------------------------------------------*/
+  -- Proyecto      : Modelo Lidar C++
+  -------------------------------------------------------------------------------
+  -- Archivo       : main.cpp
+  -- Organizacion  : Fundacion Fulgor
+  -- Fecha         : 24 Octubre 2022
+  -------------------------------------------------------------------------------
+  -- Descripcion   : Main
+  -------------------------------------------------------------------------------
+  -- Autor         : Leandro Borgnino
+  -------------------------------------------------------------------------------
+  -- Copyright (C) 2023 Fundacion Fulgor  All rights reserved
+  -------------------------------------------------------------------------------
+  -- $Id: $
+  -------------------------------------------------------------------------------*/
 
 // Includes common C++
 #include <fstream>
@@ -86,32 +86,41 @@ int main (int argc, char *argv[])
   RxLidarPulsed * rx_lidar = new RxLidarPulsed();
   rx_lidar->init             (     params      );
   
-  ////////////////////////////////
-  // :::::::: Tx LiDAR :::::::: //
-  ////////////////////////////////
+  ///////////////////////////////////////////
+  // ::: Procesamiento del Transceptor ::: //
+  ///////////////////////////////////////////
 
-  vector<double> output_tx;
-  output_tx = tx_lidar->run();
-  if ( params->getParamAsInt(string("global.LOG_TX")))
-    logger->logVariable("logs/tx_output.log",output_tx);
+  vector<double> ranges{10,30,50,80}; // From Simulator
 
-  ///////////////////////////////
-  // :::::::: Channel :::::::: //
-  ///////////////////////////////
+  for (unsigned int ii = 0; ii<ranges.size(); ii++)
+    {
+      ////////////////////////////////
+      // :::::::: Tx LiDAR :::::::: //
+      ////////////////////////////////
+
+      vector<double> output_tx;
+      output_tx = tx_lidar->run();
+      if ( params->getParamAsInt(string("global.LOG_TX")))
+	logger->logVariable("logs/tx_output"+to_string(ii)+".log",output_tx);
+      
+      ///////////////////////////////
+      // :::::::: Channel :::::::: //
+      ///////////////////////////////
   
-  vector<double> output_channel;
-  output_channel = channel_lidar->run(output_tx,20,1,0); // Warning Data from Simulator
-  if ( params->getParamAsInt(string("global.LOG_CHANNEL")))
-    logger->logVariable("logs/channel_output.log",output_channel);
+      vector<double> output_channel;
+      output_channel = channel_lidar->run(output_tx,ranges[ii],1,0); // Warning Data from Simulator
+      if ( params->getParamAsInt(string("global.LOG_CHANNEL")))
+	logger->logVariable("logs/channel_output"+to_string(ii)+".log",output_channel);
 
-  ////////////////////////////////
-  // :::::::: Rx LiDAR :::::::: //
-  ////////////////////////////////
+      ////////////////////////////////
+      // :::::::: Rx LiDAR :::::::: //
+      ////////////////////////////////
   
-  vector<double> output_rx;  
-  output_rx = rx_lidar->run(output_channel);
-  if ( params->getParamAsInt(string("global.LOG_RX")))
-    logger->logVariable("logs/rx_output.log",output_rx);
+      vector<double> output_rx;  
+      output_rx = rx_lidar->run(output_tx,output_channel);
+      if ( params->getParamAsInt(string("global.LOG_RX")))
+	logger->logVariable("logs/rx_output"+to_string(ii)+".log",output_rx);
+    }
 
 
   

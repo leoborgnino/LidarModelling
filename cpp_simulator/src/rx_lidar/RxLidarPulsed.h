@@ -28,6 +28,7 @@
 #include <complex>
 #include <random>
 #include <chrono>
+#include <algorithm>
 
 
 // Includes Propios
@@ -47,7 +48,7 @@ public:
   /**El metodo init, utiliza la clase loadSettings para determinar los valores de las
      variables que utiliza. */
   int init(loadSettings *params);
-  vector<double> run(vector<double> input_rx);    
+  vector<double> run(vector<double> input_rx_from_tx, vector<double> input_rx_from_channel);    
 
   // Interfaces
   vector <double> out_bits;
@@ -55,7 +56,7 @@ public:
   /*-----------------------------------------------------------------------*/
 private:
   void exposeVar();
-
+  std::vector<double> convolucion(const std::vector<double>& signal, const std::vector<double>& kernel);
   // Params
   int MAX_RANGE,NOS;
   double FS, POWER_RX, RPD, NOISE;
