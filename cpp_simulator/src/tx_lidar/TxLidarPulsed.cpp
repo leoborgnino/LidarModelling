@@ -22,8 +22,6 @@ TxLidarPulsed::TxLidarPulsed()
     
     printf("TxLidarPulsed :: Has been created\n");
 
-    bit_valid                   = 0;
-    counter                     = 1;
 };
 
 /*----------------------------------------------------------------------------*/
@@ -36,7 +34,11 @@ int  TxLidarPulsed::init(loadSettings *params){
     
     //code_rate           = params->getParamAsString(string("global.CODE_RATE"));
 
-    len_total = params->getParamAsInt(string("TxLidarPulsed.LEN_TOTAL"));
+    MAX_RANGE = params->getParamAsInt(string("global.MAX_RANGE"));
+    TAU_SIGNAL = params->getParamAsDouble(string("TxLidarPulsed.TAU_SIGNAL"));
+    FS = params->getParamAsDouble(string("TxLidarPulsed.FS"));
+    NOS = params->getParamAsInt(string("TxLidarPulsed.NOS"));
+    POWER_TX = params->getParamAsDouble(string("TxLidarPulsed.PTX"));
     //Registra sus variables en la refTable
     exposeVar();
     
@@ -44,13 +46,16 @@ int  TxLidarPulsed::init(loadSettings *params){
 };
 
 /*----------------------------------------------------------------------------*/
-void TxLidarPulsed::run()
+vector<double> TxLidarPulsed::run()
 {
-  bit_valid = 1;
-  for (int i = 0; i<len_total; i++)
-    out_bits.push_back(0);
-  cout << out_bits.size() << endl;
-  out_bit_valid = bit_valid;
+  int LEN_TOTAL = int((2*MAX_RANGE/LIGHT_SPEED)*FS*NOS); // Tiempo Máximo * Frecuencia de Muestreo * Sobremuestreo
+  for (int i = 0; i<LEN_TOTAL; i++)
+    if ( i < int(TAU_SIGNAL*FS*NOS) ) // Tiempo del pulso
+      out_bits.push_back(POWER_TX);
+    else
+      out_bits.push_back(0);
+
+  return out_bits;
 }
 
 /*----------------------------------------------------------------------------*/

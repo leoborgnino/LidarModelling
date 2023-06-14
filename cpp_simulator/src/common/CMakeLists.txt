@@ -2,6 +2,7 @@ SET(COMMON_SRC
         ffModule/convertible.cpp
         ffModule/loadSettings.cpp
         json/jsoncpp.cpp
+	Logger.cpp
 )
 
 ADD_LIBRARY(common STATIC ${COMMON_SRC})

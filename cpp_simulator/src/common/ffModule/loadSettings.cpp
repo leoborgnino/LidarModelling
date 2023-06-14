@@ -135,3 +135,11 @@ vector<string> * loadSettings::toStringVec(Json::Value aux)
 		v_string->push_back(aux[index].asString());
 	return v_string;
 }
+
+
+void loadSettings::exposeJson( ) 
+{
+  Json::FastWriter fastWriter;
+  std::string output = fastWriter.write(val);
+  cout << output;
+}

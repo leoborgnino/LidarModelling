@@ -1,11 +1,11 @@
 /*-----------------------------------------------------------------------------
-  -- Proyecto      : Lidar PCM
+  -- Proyecto      : Logger
   -------------------------------------------------------------------------------
-  -- Archivo       : TxLidarPulsed.h
+  -- Archivo       : Logger.h
   -- Organizacion  : Fundacion Fulgor
   -- Fecha         : 13 de Junio 2023
   -------------------------------------------------------------------------------
-  -- Descripcion   : Transmisor de LiDAR Pulsado
+  -- Descripcion   : Logger Simple para guardar datos de Simulación
   -------------------------------------------------------------------------------
   -- Autor         : Leandro Borgnino
   -------------------------------------------------------------------------------
@@ -14,50 +14,41 @@
   -- $Id$
   -------------------------------------------------------------------------------*/
 
-#ifndef TxLidarPulsed_H
-#define TxLidarPulsed_H
+#ifndef Logger_H
+#define Logger_H
 
 // Includes common C++
 #include <fstream>
 #include <vector>
 #include <iostream>
+#include <fstream>
 #include <stdlib.h> 
 #include <ctime>
 #include <math.h>
-#include <map>
-#include <complex>
 
 // Includes Propios
-#include "constants.h"
-#include "ffModule/loadSettings.h"
 
 using namespace std;
 
 /*----------------------------------------------------------------------------*/
-class TxLidarPulsed
+class Logger
 {
   /*-----------------------------------------------------------------------*/
 public:
-  TxLidarPulsed();
-  ~TxLidarPulsed();
+  Logger();
+  ~Logger();
 
   /**El metodo init, utiliza la clase loadSettings para determinar los valores de las
      variables que utiliza. */
-  int init(loadSettings *params);
-  vector<double> run();    
-
-  // Interfaces
-  int out_bit_valid;
-  vector <double> out_bits;
+  bool logVariable(string file_name, vector<double> data);
 
   /*-----------------------------------------------------------------------*/
 private:
   void exposeVar();
 
   // Params
-  int MAX_RANGE,NOS;
-  double TAU_SIGNAL, FS, POWER_TX;
   
+
   // Variables
 
 };

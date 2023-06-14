@@ -1,15 +1,13 @@
 {    
-    "global"                                : {
-        "SEED"                              : 654321,
-        "VM_ON"                             : 0
+    "global"              : {
+        "LAMBDA0"         :  950e-9, // Lambda del láser [m]
+	"MAX_RANGE"       :     300, // Rángo Máximo [m]
+	"LOG_TX"          :    true      
     },
     
     "TxLidarPulsed"       : {
         "PTX"             : 50e-3,   // Potencia del Transmisor [Watts]
         "TAU_SIGNAL"      : 5e-9,    // Duración del pulso [s]
-        "LAMBDA0"         : 950e-9,  // Lambda del láser [m]
-	"MAX_RANGE"       : 300,     // Rángo Máximo [m]
-        "Q_ELECT"         : 1.6e-19, // Carga Eléctrica [C] 
 	"FS"              : 2e9,     // Frecuencia de Muestreo [Hz]
 	"NOS"             : 5        // Sobremuestreo [Veces]
     }

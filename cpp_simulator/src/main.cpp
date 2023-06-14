@@ -25,6 +25,7 @@ using namespace std;
 
 // Tx
 #include "TxLidarPulsed.h"
+#include "Logger.h"
 
 /****************
   Utils Functions
@@ -47,17 +48,27 @@ void print_start_message()
 ******************/
 int main (int argc, char *argv[])
 {
-  print_start_message();
 
-  //::::::::::::Lectura de Parametros::::::::::::::::::
+  //:::::::: Lectura de Parametros :::::::: //
   char path_to_settings[] = "../conf/dutConfig.json";
   loadSettings *params = new loadSettings(path_to_settings);
 
-  // Tx LiDAR
-  TxLidarPulsed * tx_lidar = new TxLidarPulsed();
-  tx_lidar->init             ( params          );
+  print_start_message();
+  params->exposeJson();
 
-  tx_lidar->run();
+  //:::::::: Objetos de utilidad :::::::: //
+  Logger * logger = new Logger();
+
+  //:::::::: Tx LiDAR :::::::: //
+  vector<double> output_tx;
+  
+  TxLidarPulsed * tx_lidar = new TxLidarPulsed();
+  tx_lidar->init             (     params      );
+
+  output_tx = tx_lidar->run();
+
+  if ( params->getParamAsInt(string("global.LOG_TX")))
+    logger->logVariable("logs/tx_output.log",output_tx);
   // 
 
     

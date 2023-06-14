@@ -33,7 +33,8 @@ class loadSettings
 	string getParamAsString(string ruta);
 	vector <string> * getParamAsStringVec(string ruta);
 	unsigned long long int  getParamAsULLInt(string ruta);
-	long long int getParamAsLLInt(string ruta);
+        long long int getParamAsLLInt(string ruta);
+        void exposeJson();
 
 	private:
 	void init(char *path_file);
