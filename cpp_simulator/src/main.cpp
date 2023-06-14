@@ -100,7 +100,7 @@ int main (int argc, char *argv[])
   ///////////////////////////////
   
   vector<double> output_channel;
-  output_channel = channel_lidar->run(output_tx,1,1,0); // Warning Data from Simulator
+  output_channel = channel_lidar->run(output_tx,20,1,0); // Warning Data from Simulator
   if ( params->getParamAsInt(string("global.LOG_CHANNEL")))
     logger->logVariable("logs/channel_output.log",output_channel);
 
