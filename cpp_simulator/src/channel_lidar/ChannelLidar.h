@@ -57,6 +57,7 @@ class ChannelLidar
   // Params
   double ARX, FS, LAMBDA0;
   int NOS;
+  bool DEBUG_CH;
   
   // Variables
 

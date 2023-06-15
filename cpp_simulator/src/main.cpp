@@ -34,6 +34,7 @@ using namespace std;
 
 // Utils
 #include "Logger.h"
+#include "constants.h"
 
 /****************
   Utils Functions
@@ -63,6 +64,10 @@ int main (int argc, char *argv[])
 
   char path_to_settings[] = "../conf/dutConfig.json";
   loadSettings *params = new loadSettings(path_to_settings);
+
+  double FS_RX = params->getParamAsDouble(string("RxLidarPulsed.FS"));
+  int NOS_RX = params->getParamAsInt(string("RxLidarPulsed.NOS"));
+  bool DEBUG_FLAG = params->getParamAsInt(string("global.DEBUG"));
 
   print_start_message();
   params->exposeJson();
@@ -120,8 +125,21 @@ int main (int argc, char *argv[])
       output_rx = rx_lidar->run(output_tx,output_channel);
       if ( params->getParamAsInt(string("global.LOG_RX")))
 	logger->logVariable("logs/rx_output"+to_string(ii)+".log",output_rx);
-    }
 
+      // Calculo de la distancia
+      auto it = max_element(output_rx.begin(),output_rx.end());
+      int max_idx = distance(output_rx.begin(),it);
+      double max_value = *it;
+      double distance = ((max_idx+1-output_tx.size())/(FS_RX*NOS_RX))*LIGHT_SPEED/2;
 
-  
+      if (DEBUG_FLAG)
+	{
+	  cout << "************************" << endl;
+	  cout << "** Resultados Finales **" << endl;
+	  cout << "************************" << endl;
+	  cout << "Distance Expected: " << ranges[ii] << endl;
+	  cout << "Distance Measured: " << distance << endl;
+	  cout << "Power Detected: " << max_value << endl;
+	}
+    }  
 }

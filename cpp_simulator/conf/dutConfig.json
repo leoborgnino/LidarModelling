@@ -2,7 +2,7 @@
     "global"              : {
         "LAMBDA0"         :  950e-9, // Lambda del láser [m]
 	"MAX_RANGE"       :     300, // Rángo Máximo [m]
-	"DEBUG"           :    true,
+	"DEBUG"           :       1,
 	"LOG_TX"          :    true,
 	"LOG_CHANNEL"     :    true,
 	"LOG_RX"          :    true
@@ -12,21 +12,20 @@
         "PTX"             : 50e-3,   // Potencia del Transmisor [Watts]
         "TAU_SIGNAL"      : 5e-9,    // Duración del pulso [s]
 	"FS"              : 2e9,     // Frecuencia de Muestreo [Hz]
-	"NOS"             : 5        // Sobremuestreo [Veces]
+	"NOS"             :   5      // Sobremuestreo [Veces]
     },
 
     "ChannelLidar"        : {
         "ARX"             : 1.592e-3,// Ganancia de la ópica del receptor (pi*(2.54e-2/2)^2) diametro 1 pulgada del receptor
 	"FS"              : 2e9,     // Frecuencia de Muestreo [Hz]
-	"NOS"             : 5        // Sobremuestreo [Veces]
+	"NOS"             :   5      // Sobremuestreo [Veces]
     },
 
     "RxLidarPulsed"       : {
-	"NOISE"           :   0,     // Ruido del Detector
 	"PRX"             :   1,     // Amplificador del detector
 	"RPD"             : 0.8,     // Sensibilidad del fotodetector [A/W] 
 	"FS"              : 2e9,     // Frecuencia de Muestreo [Hz]
-	"NOS"             : 5        // Sobremuestreo [Veces]
+	"NOS"             :   5      // Sobremuestreo [Veces]
     }
 
 }

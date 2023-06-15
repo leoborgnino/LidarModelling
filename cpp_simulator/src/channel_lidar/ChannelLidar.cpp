@@ -32,6 +32,7 @@ int  ChannelLidar::init(loadSettings *params){
     /*!Se utiliza para realizar la carga de parametros y la configuracion 
       inicial de las variables*/
     LAMBDA0 = params->getParamAsDouble(string("global.LAMBDA0"));
+    DEBUG_CH = params->getParamAsInt(string("global.DEBUG"));
     FS = params->getParamAsDouble(string("ChannelLidar.FS"));
     NOS = params->getParamAsInt(string("ChannelLidar.NOS"));
     ARX = params->getParamAsDouble(string("ChannelLidar.ARX"));
@@ -51,7 +52,13 @@ vector<double> ChannelLidar::run(vector<double> channel_input, double range, dou
   double power_gain  = cos(angle_inc)*rho*ARX/(4*PI*pow(meas_range,2));
   //double delta_phase = LIGHT_SPEED/LAMBDA0*meas_delay;
 
-  cout << "Channel Power Gain: " << power_gain << endl;
+  if (DEBUG)
+    {
+      cout << "************************" << endl;
+      cout << "*** Datos del Canal   **" << endl;
+      cout << "************************" << endl;
+      cout << "Channel Power Gain: " << power_gain << endl;
+    }
 
   vector<double> channel_output = channel_input;
   

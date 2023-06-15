@@ -37,7 +37,6 @@ int  RxLidarPulsed::init(loadSettings *params){
   NOS = params->getParamAsInt(string("RxLidarPulsed.NOS"));
   POWER_RX = params->getParamAsDouble(string("RxLidarPulsed.PRX"));    
   RPD = params->getParamAsDouble(string("RxLidarPulsed.RPD"));    
-  NOISE = params->getParamAsDouble(string("RxLidarPulsed.NOISE"));
 
   noise_power = Q_ELECT/RPD*FS;
   return 0;
