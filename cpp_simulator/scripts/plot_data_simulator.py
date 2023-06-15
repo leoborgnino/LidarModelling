@@ -28,4 +28,5 @@ for j in range(len(signals)):
     plt.figure()
     for i in range(len(signals[1])):
         plt.plot(signals[j][i][-20000:])
-    plt.savefig("debug"+str(j)+".png",dpi=500)
+    plt.show()
+    #plt.savefig("debug"+str(j)+".png",dpi=500)

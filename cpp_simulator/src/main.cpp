@@ -55,7 +55,8 @@ void print_start_message()
 /****************
   Main Simulation
 ******************/
-int main (int argc, char *argv[])
+//int main (int argc, char *argv[])
+int main ()
 {
 
   /////////////////////////////////////////////

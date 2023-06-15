@@ -33,6 +33,7 @@ int  RxLidarPulsed::init(loadSettings *params){
     inicial de las variables*/    
   MAX_RANGE = params->getParamAsInt(string("global.MAX_RANGE"));
 
+  DEBUG_RX = params->getParamAsInt(string("global.DEBUG"));
   FS = params->getParamAsDouble(string("RxLidarPulsed.FS"));
   NOS = params->getParamAsInt(string("RxLidarPulsed.NOS"));
   POWER_RX = params->getParamAsDouble(string("RxLidarPulsed.PRX"));    
@@ -54,6 +55,14 @@ vector<double> RxLidarPulsed::run(vector<double> input_rx_from_tx, vector<double
   default_random_engine generator(seed);
   normal_distribution<double> dist(mean, stddev);
 
+  if (DEBUG)
+    {
+      cout << "************************" << endl;
+      cout << "** Datos del Receptor **" << endl;
+      cout << "************************" << endl;
+      cout << "Noise Power Gain: " << noise_power << endl;
+    }
+  
   // AFE
   out_bits = input_rx_from_channel;
   for (unsigned int ii = 0; ii < input_rx_from_channel.size(); ii++)

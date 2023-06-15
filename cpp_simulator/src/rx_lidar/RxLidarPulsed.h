@@ -60,6 +60,7 @@ private:
   // Params
   int MAX_RANGE,NOS;
   double FS, POWER_RX, RPD, NOISE;
+  bool DEBUG_RX;
   
   // Variables
   double noise_power;
