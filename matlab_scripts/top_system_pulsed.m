@@ -31,10 +31,10 @@ PLOT_CH = false;
 LOG_CH = false;
 READ_FROM_FILE = true;                             % Leer de la base de datos del simulador 3D
 DATAPATH_CARLA = '../data/data_from_ros_15:30:42'; % path a los datos del simulador 3D
-N_FRAMES = 1;                                    % Número de frames a procesar (end para todos)
+N_FRAMES = 5;                                    % Número de frames a procesar (end para todos)
 
 %%% RX
-WRITE_TO_FILE = false;                       % Escribir datos procesados
+WRITE_TO_FILE = true;                       % Escribir datos procesados
 PLOT_RX = false;
 PLOT_LOG = false;
 LOG_RX = false;
@@ -77,39 +77,31 @@ if (READ_FROM_FILE)
         max_mf = [];
         new_dist = [];
 
-	figure
-	hold all
-%%% Recorre cada uno de los rangos
+	%figure
+	%hold all
+        %%% Recorre cada uno de los rangos
 	range = [20,40,50,60,80,100];
-        for i=1:length(range)
-            %%% Procesamiento del canal
-            rho(i)
-	    range(i)
-            ch_out = Channel.ProcessChannel(tline,tx_signal,range(i),rho(i),PLOT_CH);
-            %%% Receptor
-            [output_rx,f_vec] = Receptor.ProcessRx(tline,ch_out,2,PLOT_RX);
-            [max_value,max_idx] = max(real(output_rx));
-            %%% Post Procesamiento datos del Receptor
-            max_mf_idx = [max_mf_idx max_idx];
-            max_mf = [max_mf max_value];
-	    plot(output_rx)
-	    max_idx
-            dist = (max_idx/SettingsRx.FS)*3e8/2
-            new_dist = [new_dist dist];
+        for i=1:size(range)
+          %%% Procesamiento del canal
+          rho(i);
+	  range(i);
+          ch_out = Channel.ProcessChannel(tline,tx_signal,range(i),rho(i),PLOT_CH);
+          %%% Receptor
+          [output_rx,f_vec] = Receptor.ProcessRx(tline,ch_out,2,PLOT_RX);
+          [max_value,max_idx] = max(real(output_rx));
+          %%% Post Procesamiento datos del Receptor
+          max_mf_idx = [max_mf_idx max_idx];
+          max_mf = [max_mf max_value];
+	  %plot(output_rx)
+	  max_idx;
+          dist = ((max_idx-1)/SettingsRx.FS)*3e8/2;
+          new_dist = [new_dist dist];
         end
         
-        %%% Guardar frecuencias para detectar problemas
-        if(PLOT_LOG)
-            figure('visible','off')
-            stem(max_freq);
-            ax = gca;
-            name = strcat('./images/fft_',sprintf('%d',k),'.jpg')
-            saveas(ax,name)
-        end
-
         %%%% Escribir nuevo archivo con datos procesados
         if (WRITE_TO_FILE)
-            datapath_out = strcat(datapath,'_matlab/')
+	    %datapath = 'pulsed_out'
+            datapath_out = strcat(DATAPATH_CARLA,'_matlab_pulsed/')
             name_folder = split(datapath_out,"/")
             name_folder = char(name_folder(3))
             mkdir('../data/',name_folder)

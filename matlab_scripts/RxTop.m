@@ -56,7 +56,8 @@ classdef RxTop
             prx_measured = mean(abs(dsp_input).^2);
             
             %%% FFT
-            y_mf = abs(fft(dsp_input,obj.NFFT)).^2;
+            %y_mf = abs(fft(dsp_input,obj.NFFT)).^2;
+            y_mf = abs(dct(dsp_input,obj.NFFT)).^2;
             f_vec = (0:obj.NFFT-1)*(obj.SettingsRx.FS/obj.NFFT);
             if (PLOT_RX)
                 figure

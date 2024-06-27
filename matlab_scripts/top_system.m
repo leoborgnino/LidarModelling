@@ -27,14 +27,14 @@ LOG_TX = false;                              % Loguear señales del TX
 %%% Channel
 PLOT_CH = false;
 LOG_CH = false;
-READ_FROM_FILE = true;                             % Leer de la base de datos del simulador 3D
+READ_FROM_FILE = false;                            % Leer de la base de datos del simulador 3D
 DATAPATH_CARLA = '../data/data_from_ros_15:30:42'; % path a los datos del simulador 3D
-N_FRAMES = 5;                                    % Número de frames a procesar (end para todos)
+N_FRAMES = 5;                                      % Número de frames a procesar (end para todos)
 
 %%% RX
-WRITE_TO_FILE = false;                       % Escribir datos procesados
+WRITE_TO_FILE = true;                       % Escribir datos procesados
 PLOT_RX = false;
-PLOT_LOG = true;
+PLOT_LOG = false;
 LOG_RX = false;
 
 %%%%%%%%
@@ -100,7 +100,7 @@ if (READ_FROM_FILE)
 
         %%%% Escribir nuevo archivo con datos procesados
         if (WRITE_TO_FILE)
-            datapath_out = strcat(datapath,'_matlab/')
+            datapath_out = strcat(DATAPATH_CARLA,'_matlab_fmcw/')
             name_folder = split(datapath_out,"/")
             name_folder = char(name_folder(3))
             mkdir('../data/',name_folder)
@@ -114,7 +114,7 @@ if (READ_FROM_FILE)
         end
     end
 else
-    range = [1]; % m Rango
+    range = [10]; % m Rango
     rho = [1];   % Reflectividad                         
     
     max_fft = [];
@@ -122,12 +122,12 @@ else
     new_dist = [];
     for i=1:size(range)
         ch_out = Channel.ProcessChannel(tline,tx_signal,range(i),rho(i),PLOT_CH);
-        Receptor.ProcessRx(tline,ch_out,tx_signal,PLOT_RX);
         [output_rx,f_vec] = Receptor.ProcessRx(tline,ch_out,tx_signal,PLOT_RX);
+        plot(output_rx)
         [max_value,max_idx] = max(output_rx);
         max_fft = [max_fft max_idx];
         max_freq = [max_freq f_vec(max_idx)];
-        dist = f_vec(max_idx)*(1/Transmitter.CHIRP_SLOPE)*3e8/2;
+        dist = f_vec(max_idx)*(1/Transmitter.CHIRP_SLOPE)*3e8/2
         new_dist = [new_dist dist];
     end
 end

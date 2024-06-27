@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 DEBUG = False
 
 datapath_read = '../data/rosbag2_2023_01_29-17_21_07'
-datapath_read_matlab = '../data/data_from_ros_15:30:42_matlab'
+datapath_read_matlab = '../data/data_from_ros_15:30:42_matlab_fmcw'
 list_files = os.listdir(datapath_read_matlab)
 list_files.sort(reverse=True)
 
@@ -90,7 +90,7 @@ with Reader(datapath_read) as reader:
 # create reader instance and open for writting
 now = datetime.now()
 current_time = now.strftime("%H:%M:%S")
-with Writer('../data/rosbag_'+current_time) as writer:
+with Writer('../data/rosbag_fmcw_'+current_time) as writer:
     topic_write = '/carla/ego_vehicle/lidar2_processed'
     topic_write_original = '/carla/ego_vehicle/lidar2_original'
     msgtype = PointCloud2_rosbags.__msgtype__
