@@ -8,21 +8,21 @@ import random
 import numpy as np
 from numpy import random
 from matplotlib import cm
-import open3d as o3d
+#import open3d as o3d
 from queue import Queue
 from queue import Empty
 import logging
-import cv2
+#import cv2
 import math
 import json
 
-try:
-    sys.path.append(glob.glob('../carla/dist/carla-*%d.%d-%s.egg' % (
-        sys.version_info.major,
-        sys.version_info.minor,
-        'win-amd64' if os.name == 'nt' else 'linux-x86_64'))[0])
-except IndexError:
-    pass
+#try:
+#    sys.path.append(glob.glob('../carla/dist/carla-*%d.%d-%s.egg' % (
+#        sys.version_info.major,
+#        sys.version_info.minor,
+#        'win-amd64' if os.name == 'nt' else 'linux-x86_64'))[0])
+#except IndexError:
+#    pass
 
 import carla
 
@@ -385,7 +385,7 @@ def run_data_collect(map,client,images_path,pointclouds_path,pointclouds_carla_p
         camera.destroy()
         if(model_carla_lidar):
             carla_lidar.destroy()
-        cv2.destroyAllWindows()
+        #cv2.destroyAllWindows()
 
         client.apply_batch([carla.command.DestroyActor(x) for x in cars_list])
         client.apply_batch([carla.command.DestroyActor(x) for x in bikes_list])
