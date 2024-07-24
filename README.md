@@ -78,9 +78,12 @@ This project was developed by Fundación Fulgor as final work for Leandro Borgni
 	cd carla
     make PythonAPI
     cd PythonAPI\carla\dist
-    pip install carla-0.9.15-cp312-cp312-win_amd64.whl
+    pip install carla-0.9.15-cp38-cp38-win_amd64.whl
     ```
+
 
 -----
 
 ## Configuration
+
+Work in progress

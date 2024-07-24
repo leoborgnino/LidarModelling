@@ -56,7 +56,7 @@ def create_folder(output_directory,folder):
     return output_folder
 
 def create_output_folders(model_carla_lidar):
-    current_datetime = datetime.now().strftime("%d-%m-%y_%X")
+    current_datetime = datetime.now().strftime("%d-%m-%y_%X").replace(':','_')
     output_directory = os.path.join(current_datetime,OUTPUT_FOLDER)
 
     images_path = create_folder(output_directory, IMAGES_FOLDER)
