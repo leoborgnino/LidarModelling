@@ -35,7 +35,8 @@ class loadSettings
 	unsigned long long int  getParamAsULLInt(string ruta);
         long long int getParamAsLLInt(string ruta);
         void exposeJson();
-
+        void printIndentedJSON(const std::string& jsonString, int indent);
+  
 	private:
 	void init(char *path_file);
 	Json::Value readPath(string ruta);

@@ -9,6 +9,7 @@
     },
     
     "TxLidarPulsed"       : {
+	"PULSE_SHAPE"     :     0,   // 0: Gaussian, 1: Rectangular
         "PTX"             : 50e-3,   // Potencia del Transmisor [Watts]
         "TAU_SIGNAL"      : 5e-9,    // Duración del pulso [s] si lo aumento, gano SNR, pierdo resolución
 	"FS"              : 2e9,     // Frecuencia de Muestreo [Hz]
