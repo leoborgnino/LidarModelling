@@ -141,5 +141,56 @@ void loadSettings::exposeJson( )
 {
   Json::FastWriter fastWriter;
   std::string output = fastWriter.write(val);
-  cout << output;
+  printIndentedJSON(output,4);
+}
+
+void loadSettings::printIndentedJSON(const std::string& jsonString, int indent) {
+    int level = 0;
+    bool inQuotes = false;
+
+    for (size_t i = 0; i < jsonString.length(); ++i) {
+        char currentChar = jsonString[i];
+
+        switch (currentChar) {
+            case '{':
+            case '[':
+                if (!inQuotes) {
+                    std::cout << currentChar << "\n" << std::string(++level * indent, ' ');
+                } else {
+                    std::cout << currentChar;
+                }
+                break;
+            case '}':
+            case ']':
+                if (!inQuotes) {
+                    std::cout << "\n" << std::string(--level * indent, ' ') << currentChar;
+                } else {
+                    std::cout << currentChar;
+                }
+                break;
+            case ',':
+                if (!inQuotes) {
+                    std::cout << currentChar << "\n" << std::string(level * indent, ' ');
+                } else {
+                    std::cout << currentChar;
+                }
+                break;
+            case ':':
+                if (!inQuotes) {
+                    std::cout << currentChar << " ";
+                } else {
+                    std::cout << currentChar;
+                }
+                break;
+            case '"':
+                std::cout << currentChar;
+                inQuotes = !inQuotes;
+                break;
+            default:
+                std::cout << currentChar;
+                break;
+        }
+    }
+
+    std::cout << std::endl;
 }
