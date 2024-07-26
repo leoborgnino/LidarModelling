@@ -41,7 +41,7 @@ POINTCLOUDS_CARLA_FOLDER = "velodyne_carla"
 LABELS_FOLDER = "label_2"
 CALIB_FOLDER = "calib"
 
-LIST_VEHICLES_PATH = "../../Unreal/CarlaUE4/LidarModelFiles/vehicles.json"
+LIST_VEHICLES_PATH = "./LidarModelFiles/vehicles.json"
 
 """ SAVE PATHS """
 LIDAR_PATH = os.path.join(OUTPUT_FOLDER, 'velodyne/{0:06}.bin')
@@ -72,6 +72,7 @@ def create_output_folders(model_carla_lidar):
     return output_directory,images_path,pointcloud_path,pointcloud_carla_path,calib_path,labels_path
 
 def load_list_of_vehicles():
+    
     file = open(LIST_VEHICLES_PATH)
     data=json.load(file)
     file.close()
@@ -154,6 +155,7 @@ def run_data_collect(map,client,images_path,pointclouds_path,pointclouds_carla_p
         camera = world.spawn_actor(blueprint=camera_bp,
             transform=carla.Transform(carla.Location(x=0.0,y=-0.06, z=1.65)), #posicion segun Kitti 
             attach_to=vehicle)
+        cnt_debug = 0
 
         lidar = world.spawn_actor(
             blueprint=lidar_bp,
@@ -172,13 +174,14 @@ def run_data_collect(map,client,images_path,pointclouds_path,pointclouds_carla_p
         lidar_queue= Queue()
         if(model_carla_lidar):
             carla_lidar_queue= Queue()
-
         #Al recibir un nuevo data, se almacena en la cola
         lidar.listen(lambda data: sensor_callback(data,lidar_queue))
         camera.listen(lambda data: sensor_callback(data,image_queue))
         if(model_carla_lidar):
             carla_lidar.listen(lambda data: sensor_callback(data,carla_lidar_queue))
-        
+     
+        print("Lidar Spawned")
+
         #spawnear trafico 
         list_of_cars,list_of_bikes = load_list_of_vehicles()
 
@@ -187,12 +190,11 @@ def run_data_collect(map,client,images_path,pointclouds_path,pointclouds_carla_p
 
         bikes_bp = blueprint_library.filter('vehicle.*') #blueprints de todos los vehiculos
         bikes_bp = [x for x in bikes_bp if x.id.endswith(tuple(list_of_bikes)) ]
-
-        #print(vehicles_bp)
         
         cars_bp = sorted(cars_bp, key=lambda bp: bp.id)
         spawn_points.pop(sp_vehicle) #se quita el punto en el que se spawnea el vehivulo con los sensores
-        #print('SpawnPoints disponibles: {}'.format(len(spawn_points)))
+        
+        print('SpawnPoints disponibles: {}'.format(len(spawn_points)))
         random.shuffle(spawn_points) #mezclar 
 
         percentaje_cars = percentages_objects[0]/100
@@ -213,7 +215,7 @@ def run_data_collect(map,client,images_path,pointclouds_path,pointclouds_carla_p
             spawn_point_selected = random.choice(spawn_points)
             cars_spawn_points.append(spawn_point_selected)
             spawn_points.remove(spawn_point_selected)
-        
+         
         bikes_spawn_points = spawn_points
         
         cars_list = spawn_vehicles(cars_spawn_points, number_of_cars, cars_bp, traffic_manager,client)
@@ -251,12 +253,13 @@ def run_data_collect(map,client,images_path,pointclouds_path,pointclouds_carla_p
                                 [0, 0, -1],
                                 [1, 0,  0]])
 
-        #print("Inicio de captura")
+        print("Inicio de captura")
         start_gen = datetime.now()
 
         while frames_captured < frames:
-
+            cnt_debug+=1        
             world.tick()
+            cnt_debug+=1        
             ticks += 1
             #time.sleep(0.001)
             world_frame = world.get_snapshot().frame
@@ -415,10 +418,10 @@ def main(arg):
     """Spawnea el LIDAR HDL-64E y una camara RGB en un vehiculo, y genera un paso de simulacion"""
     #Cliente y simulador
     client = carla.Client('localhost', 2000)
-    client.set_timeout(100.0)
+    client.set_timeout(30.0)
     
     #Crear directorios para guardar los datos, nubes de puntos, imagenes y labels
-    model_carla_lidar = True #para instanciar un segundo lidar que utilize el modelo por defecto de carla
+    model_carla_lidar = False #para instanciar un segundo lidar que utilize el modelo por defecto de carla
     output_directory,images_path,pointclouds_path,pointclouds_carla_path,calib_path,labels_path = create_output_folders(model_carla_lidar)
 
     #Log file

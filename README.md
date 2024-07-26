@@ -53,8 +53,8 @@ This project was developed by Fundación Fulgor as final work for Leandro Borgni
     make 
     ./LidarCPP
     ```
-3. ** [Install CARLA UE4](https://carla.readthedocs.io/en/latest/build_windows/) until Part Two **
-4. ** Follow Part Two of Build CARLA but using carla submodule from this repository**
+3. **[Install CARLA UE4](https://carla.readthedocs.io/en/latest/build_windows/) until Part Two**
+4. **Follow Part Two of Build CARLA but using carla submodule from this repository**
 
 
 -----

@@ -39,7 +39,7 @@ POINTCLOUDS_CARLA_FOLDER = "velodyne_carla"
 LABELS_FOLDER = "label_2"
 CALIB_FOLDER = "calib"
 
-LIST_VEHICLES_PATH = "../../Unreal/CarlaUE4/LidarModelFiles/vehicles.json"
+LIST_VEHICLES_PATH = "./LidarModelFiles/vehicles.json"
 
 """ SAVE PATHS """
 LIDAR_PATH = os.path.join(OUTPUT_FOLDER, 'velodyne/{0:06}.bin')
