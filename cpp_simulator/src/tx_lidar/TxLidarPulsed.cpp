@@ -83,7 +83,7 @@ std::vector<double> TxLidarPulsed::rectangular_pulse(double I_max, double T_puls
 
     // Calcular la signal para cada punto de tiempo t
     for (int i = 0; i<LEN_TOTAL; i++)
-      if ( i < int(T_pulso*FS*NOS) ) // Tiempo del pulso
+      if ( (i >= int(FS*NOS*(T_pulso/2)) ) && (i <= int((3*T_pulso/2)*FS*NOS)) ) // Tiempo del pulso
 	signal.push_back(I_max);
       else
 	signal.push_back(0);
