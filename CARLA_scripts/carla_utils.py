@@ -29,7 +29,7 @@ def generate_lidar_bp(blueprint_library,delta,ang_inc,material,reflectance_limit
     return lidar_bp
 
 def generate_lidar_bp_by_gui(blueprint_library,delta,lidar_all_configs):
-    lidar_bp = blueprint_library.find('sensor.lidar.ray_cast')
+    lidar_bp = blueprint_library.find('sensor.lidar.ray_cast_time_resolved')
     lidar_bp.set_attribute('upper_fov', lidar_all_configs[0])
     lidar_bp.set_attribute('lower_fov', lidar_all_configs[1])
     lidar_bp.set_attribute('channels', lidar_all_configs[2])
@@ -37,7 +37,7 @@ def generate_lidar_bp_by_gui(blueprint_library,delta,lidar_all_configs):
     lidar_bp.set_attribute('rotation_frequency', str(1.0 / delta))
     lidar_bp.set_attribute('points_per_second', str(int(lidar_all_configs[4])/delta))
     lidar_bp.set_attribute('noise_stddev', lidar_all_configs[5])
-    lidar_bp.set_attribute('noise_stddev_intensity',lidar_all_configs[6])
+    #lidar_bp.set_attribute('noise_stddev_intensity',lidar_all_configs[6])
     lidar_bp.set_attribute('atmosphere_attenuation_rate',lidar_all_configs[7])
     lidar_bp.set_attribute('dropoff_general_rate', lidar_all_configs[8])
     lidar_bp.set_attribute('dropoff_intensity_limit', lidar_all_configs[9])
@@ -47,10 +47,10 @@ def generate_lidar_bp_by_gui(blueprint_library,delta,lidar_all_configs):
         lidar_bp.set_attribute('model_angle', 'true')
     if(lidar_all_configs[12]):
         lidar_bp.set_attribute('model_material', 'true')
-    if(lidar_all_configs[13]):
-        lidar_bp.set_attribute('model_reflectance_limits_function', 'true')
-        lidar_bp.set_attribute('reflectance_limits_function_coeff_a', lidar_all_configs[14])
-        lidar_bp.set_attribute('reflectance_limits_function_coeff_b', lidar_all_configs[15])
+    #if(lidar_all_configs[13]):
+    #    lidar_bp.set_attribute('model_reflectance_limits_function', 'true')
+    #    lidar_bp.set_attribute('reflectance_limits_function_coeff_a', lidar_all_configs[14])
+    #    lidar_bp.set_attribute('reflectance_limits_function_coeff_b', lidar_all_configs[15])
     return lidar_bp
 
 
@@ -97,15 +97,37 @@ def save_image(images_path, image_data,frame):
     #print('imagen %.6d.bin guardada' % image_data.frame)
 
 def save_pointcloud(pointclouds_path,pointcloud,frame):
-    pc = np.copy(np.frombuffer(pointcloud.raw_data, dtype=np.dtype('f4')))
-    pc = np.reshape(pc, (int(pc.shape[0] / 4), 4))
+    print(pointcloud.raw_data)
+    print(pointcloud.raw_data.shape)
+
+    data = np.copy(np.frombuffer(pointcloud.raw_data, dtype=np.dtype('f4')))
+
+    total_points = 0
+    for i in range(pointcloud.channels):
+        total_points += pointcloud.get_point_count(i)
+        #print(point_cloud.get_point_count(i))
+
+    points = data[0:total_points*4]
+    time_resolved_signals = data[total_points*4::]
+
+    data = np.reshape(points, (int(points.shape[0] / 4), 4))
+
+    len_signal = int(len(time_resolved_signals)/(total_points))
+    #print(len_signal)
+    data2 = np.reshape(time_resolved_signals, (int(time_resolved_signals.shape[0] /  len_signal ), len_signal))
+
+    #print(data)
+    #print(data2)
+
+    np.savetxt('./logs/time_signal.txt', data2, delimiter=" ", fmt="%s")
+
     #UNREAL Y EL LIDAR INTERNO UTILIZA EL SISTEMA X: Foward, Y:Right, Z: Up
     #PERO EL LIDAR EN KITTI UTILIZA X: Foward, Y:Left, Z: Up
     #Por lo que hay que invertir las coordenas y
 
-    pc[:,1] = -pc[:,1]
+    data[:,1] = -data[:,1]
     pointcloud_path = './%s/%.6d.bin' % (pointclouds_path, frame) 
-    pc.tofile(pointcloud_path)
+    data.tofile(pointcloud_path)
     #print('point cloud %.6d.bin guardada' % lidar_data.frame)
 
 def sensor_callback(data,queue):

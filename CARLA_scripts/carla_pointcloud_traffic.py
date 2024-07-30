@@ -33,7 +33,7 @@ from kitti_label import KittiLabel
 OUTPUT_FOLDER = "training"
 POINTCLOUDS_FOLDER = "velodyne"
 
-LIST_VEHICLES_PATH = "../Unreal/CarlaUE4/LidarModelFiles/vehicles.json"
+LIST_VEHICLES_PATH = "./LidarModelFiles/vehicles.json"
 
 
 def sensor_callback(data,queue):

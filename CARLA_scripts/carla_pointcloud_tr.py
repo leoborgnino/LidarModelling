@@ -10,10 +10,10 @@ from matplotlib import cm
 import matplotlib.pyplot as plt
 import open3d as o3d
 from kitti_label import KittiLabel, generate_kittilabel
-try:
-    sys.path.append('../PythonAPI/carla/dist/carla-0.9.13-py3.8-linux-x86_64.egg')
-except IndexError:
-    pass
+#try:
+#    sys.path.append('../PythonAPI/carla/dist/carla-0.9.13-py3.8-linux-x86_64.egg')
+#except IndexError:
+#    pass
 
 import carla
 
@@ -24,7 +24,7 @@ POINTCLOUDS_FOLDER = "velodyne"
 LABELS_FOLDER = "label_2"
 CALIB_FOLDER = "calib"
 
-LIST_VEHICLES_PATH = "../../Unreal/CarlaUE4/LidarModelFiles/vehicles.json"
+LIST_VEHICLES_PATH = "./LidarModelFiles/vehicles.json"
 
 """ SAVE PATHS """
 LIDAR_PATH = os.path.join(OUTPUT_FOLDER, 'velodyne/{0:06}.bin')

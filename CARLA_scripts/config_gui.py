@@ -8,10 +8,11 @@ class config_gui:
     def __init__(self):
         #labels a mostrar en interfaz, e inputs del usuario
         self.sim_configs_texts = ['Cantidad de datos: ','Datos por segundo: ']
+        self.sim_config_default_values = ['1000','1']
         self.sim_config_inputs = []
 
         self.sim_maps_texts = ["Town01", "Town02", "Town03", "Town04","Town05","Town06","Town07"]
-        self.sim_map_selected = None
+        self.sim_map_selected = "Town01"
 
         self.sim_objects_texts = ['Automoviles: ','Cilistas: ', 'Peatones: ']
         self.sim_objects_default_values = ['60','8','30']
@@ -273,7 +274,7 @@ class config_gui:
         columna_inicial = 0
         #OPCIONES A CONFIGURAR
         fila_actual = 0
-        fila_actual = self.create_text_boxs(ventana,fila_actual,columna_inicial,self.sim_configs_texts,self.sim_config_inputs)
+        fila_actual = self.create_text_boxs(ventana,fila_actual,columna_inicial,self.sim_configs_texts,self.sim_config_inputs,self.sim_config_default_values)
 
         #SELECCION DE MAPA
         self.sim_map_selected = tk.StringVar()
