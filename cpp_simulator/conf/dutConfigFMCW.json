@@ -9,7 +9,6 @@
     },
     
     "TxLidarFMCW"       : {
-	"PULSE_SHAPE"     :     0,   // 0: Gaussian, 1: Rectangular
         "PTX"             : 50e-3,   // Potencia del Transmisor [Watts]
         "F_BW"            :   2e9,   // Ancho de banda del chirp (f_BW) [Hz]
         "F_MIN"           :     0,   // Frecuencia minima del chirp (f_min) [Hz]
@@ -24,7 +23,7 @@
 	"NOS"             :   5      // Sobremuestreo [Veces]
     },
 
-    "RxLidarPulsed"       : {
+    "RxLidarFMCW"       : {
 	"PRX"             :   1,     // Amplificador del detector
 	"RPD"             : 0.8,     // Sensibilidad del fotodetector [A/W] 
 	"FS"              : 2e9,     // Frecuencia de Muestreo [Hz]

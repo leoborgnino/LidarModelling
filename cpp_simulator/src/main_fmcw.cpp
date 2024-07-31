@@ -30,7 +30,7 @@ using namespace std;
 #include "ChannelLidar.h"
 
 // Rx
-#include "RxLidarPulsed.h" //Change
+#include "RxLidarFMCW.h" //Change
 
 // Utils
 #include "Logger.h"
@@ -66,8 +66,8 @@ int main ()
   char path_to_settings[] = "../conf/dutConfigFMCW.json";
   loadSettings *params = new loadSettings(path_to_settings);
 
-  double FS_RX = params->getParamAsDouble(string("RxLidarPulsed.FS"));
-  int NOS_RX = params->getParamAsInt(string("RxLidarPulsed.NOS"));
+  double FS_RX = params->getParamAsDouble(string("RxLidarFMCW.FS"));
+  int NOS_RX = params->getParamAsInt(string("RxLidarFMCW.NOS"));
   bool DEBUG_FLAG = params->getParamAsInt(string("global.DEBUG"));
 
   print_start_message();
@@ -89,7 +89,7 @@ int main ()
   ChannelLidar * channel_lidar = new ChannelLidar();
   channel_lidar->init        (     params      );
     
-  RxLidarPulsed * rx_lidar = new RxLidarPulsed();
+  RxLidarFMCW * rx_lidar = new RxLidarFMCW();
   rx_lidar->init             (     params      );
   
   ///////////////////////////////////////////

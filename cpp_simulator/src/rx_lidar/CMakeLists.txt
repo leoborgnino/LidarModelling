@@ -1,5 +1,6 @@
 SET(RX_LIDAR_SRC
   RxLidarPulsed.cpp
+  RxLidarFMCW.cpp
   )
 
 ADD_LIBRARY(rx_lidar STATIC ${RX_LIDAR_SRC})
