@@ -23,8 +23,8 @@ target_include_directories (LiDARCPPFMCW PUBLIC ${CMAKE_SOURCE_DIR}/tx_lidar
 			    ${CMAKE_SOURCE_DIR}/common )
 
 
-TARGET_LINK_LIBRARIES(LiDARCPP tx_lidar rx_lidar channel_lidar common pthread)
-TARGET_LINK_LIBRARIES(LiDARCPPFMCW tx_lidar rx_lidar channel_lidar common pthread)
+TARGET_LINK_LIBRARIES(LiDARCPP tx_lidar rx_lidar channel_lidar common pthread fftw3)
+TARGET_LINK_LIBRARIES(LiDARCPPFMCW tx_lidar rx_lidar channel_lidar common pthread fftw3)
 
 INSTALL(TARGETS LiDARCPP DESTINATION ${CMAKE_SOURCE_DIR}/../bin)
 INSTALL(TARGETS LiDARCPPFMCW DESTINATION ${CMAKE_SOURCE_DIR}/../bin)

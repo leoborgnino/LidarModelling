@@ -68,12 +68,46 @@ vector<double> RxLidarFMCW::run(vector<double> input_rx_from_tx, vector<double> 
   for (unsigned int ii = 0; ii < input_rx_from_channel.size(); ii++)
     out_bits[ii] = input_rx_from_channel[ii] + sqrt(noise_power)*dist(generator);
 
-  // MF
-  vector<double> matched_filter = input_rx_from_tx;
-  reverse(matched_filter.begin(), matched_filter.end());
-  out_bits = convolucion(matched_filter,out_bits);
+  // Mixer
+  for (unsigned int ii = 0; ii < input_rx_from_channel.size(); ii++)
+    out_bits[ii] = 2 * RPD * out_bits[ii] * input_rx_from_tx[ii];
   
-  return out_bits;
+  // FFT
+  
+  // Preparar los arreglos para FFTW
+  int N = input_rx_from_channel.size();
+  double *in;
+  fftw_complex *out;
+  fftw_plan p;
+  
+  in = (double*) fftw_malloc(sizeof(double) * N);
+  out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * (N / 2 + 1));
+  
+  for (int i = 0; i < N; ++i)
+    in[i] = out_bits[i];
+  
+  // Crear el plan para FFTW
+  p = fftw_plan_dft_r2c_1d(N, in, out, FFTW_ESTIMATE);
+  
+  // Ejecutar la FFT
+  fftw_execute(p);
+  
+  // Calcular el módulo (magnitud) de la FFT
+  std::vector<double> magnitude(N / 2 + 1);
+  for (int i = 0; i < N / 2 + 1; ++i) 
+    magnitude[i] = std::hypot(out[i][0], out[i][1]);
+  
+  // Imprimir los resultados
+  std::cout << "Magnitud de la FFT:" << std::endl;
+  for (int i = 0; i < N / 2 + 1; ++i)
+    std::cout << "Bin " << i << ": " << magnitude[i] << std::endl;
+
+  // Limpiar
+  fftw_destroy_plan(p);
+  fftw_free(in);
+  fftw_free(out);
+  
+  return magnitude;
 }
 
 /*----------------------------------------------------------------------------*/
