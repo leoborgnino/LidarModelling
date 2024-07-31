@@ -10,13 +10,22 @@ ADD_SUBDIRECTORY(channel_lidar out/channel_lidar)
 ADD_SUBDIRECTORY(common out/common)
 
 ADD_EXECUTABLE(LiDARCPP main.cpp)
+ADD_EXECUTABLE(LiDARCPPFMCW main_fmcw.cpp)
 
 target_include_directories (LiDARCPP PUBLIC ${CMAKE_SOURCE_DIR}/tx_lidar
 			    ${CMAKE_SOURCE_DIR}/rx_lidar
 			    ${CMAKE_SOURCE_DIR}/channel_lidar
 			    ${CMAKE_SOURCE_DIR}/common )
 
+target_include_directories (LiDARCPPFMCW PUBLIC ${CMAKE_SOURCE_DIR}/tx_lidar
+			    ${CMAKE_SOURCE_DIR}/rx_lidar
+			    ${CMAKE_SOURCE_DIR}/channel_lidar
+			    ${CMAKE_SOURCE_DIR}/common )
+
+
 TARGET_LINK_LIBRARIES(LiDARCPP tx_lidar rx_lidar channel_lidar common pthread)
+TARGET_LINK_LIBRARIES(LiDARCPPFMCW tx_lidar rx_lidar channel_lidar common pthread)
 
 INSTALL(TARGETS LiDARCPP DESTINATION ${CMAKE_SOURCE_DIR}/../bin)
+INSTALL(TARGETS LiDARCPPFMCW DESTINATION ${CMAKE_SOURCE_DIR}/../bin)
 
