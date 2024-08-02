@@ -66,7 +66,7 @@ vector<double> RxLidarFMCW::run(vector<double> input_rx_from_tx, vector<double> 
   // AFE
   out_bits = input_rx_from_channel;
   for (unsigned int ii = 0; ii < input_rx_from_channel.size(); ii++)
-    out_bits[ii] = input_rx_from_channel[ii] + sqrt(noise_power)*dist(generator);
+    out_bits[ii] = input_rx_from_channel[ii]; //+ sqrt(noise_power)*dist(generator);
 
   // Mixer
   for (unsigned int ii = 0; ii < input_rx_from_channel.size(); ii++)
@@ -98,9 +98,9 @@ vector<double> RxLidarFMCW::run(vector<double> input_rx_from_tx, vector<double> 
     magnitude[i] = std::hypot(out[i][0], out[i][1]);
   
   // Imprimir los resultados
-  std::cout << "Magnitud de la FFT:" << std::endl;
-  for (int i = 0; i < N / 2 + 1; ++i)
-    std::cout << "Bin " << i << ": " << magnitude[i] << std::endl;
+  //std::cout << "Magnitud de la FFT:" << std::endl;
+  //for (int i = 0; i < N / 2 + 1; ++i)
+  //  std::cout << "Bin " << i << ": " << magnitude[i] << std::endl;
 
   // Limpiar
   fftw_destroy_plan(p);

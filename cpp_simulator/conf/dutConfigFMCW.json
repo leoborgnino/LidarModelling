@@ -10,9 +10,8 @@
     
     "TxLidarFMCW"       : {
         "PTX"             : 50e-3,   // Potencia del Transmisor [Watts]
-        "F_BW"            :   1e9,   // Ancho de banda del chirp (f_BW) [Hz]
+        "F_BW"            :   1e8,   // Ancho de banda del chirp (f_BW) [Hz]
         "F_MIN"           :     0,   // Frecuencia minima del chirp (f_min) [Hz]
-        "T_MOD"           :  5e-6,   // Duración del chirp [s]
 	"FS"              :   2e9,   // Frecuencia de Muestreo [Hz]
 	"NOS"             :     5    // Sobremuestreo [Veces]
     },

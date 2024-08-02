@@ -68,6 +68,8 @@ int main ()
 
   double FS_RX = params->getParamAsDouble(string("RxLidarFMCW.FS"));
   int NOS_RX = params->getParamAsInt(string("RxLidarFMCW.NOS"));
+  double F_BW = params->getParamAsDouble(string("TxLidarFMCW.F_BW"));
+  double MAX_RANGE = params->getParamAsDouble(string("global.MAX_RANGE"));
   bool DEBUG_FLAG = params->getParamAsInt(string("global.DEBUG"));
 
   print_start_message();
@@ -97,6 +99,7 @@ int main ()
   ///////////////////////////////////////////
 
   vector<double> ranges{10,30,50,80}; // From Simulator
+  //vector<double> ranges{10}; // From Simulator
 
   for (unsigned int ii = 0; ii<ranges.size(); ii++)
     {
@@ -131,15 +134,22 @@ int main ()
       auto it = max_element(output_rx.begin(),output_rx.end());
       int max_idx = distance(output_rx.begin(),it);
       double max_value = *it;
-      double distance = ((max_idx+1-output_tx.size())/(FS_RX*NOS_RX))*LIGHT_SPEED/2;
+      double frequency_max = (FS_RX*NOS_RX)/output_tx.size() * (max_idx+1);
+      double freq_to_range = LIGHT_SPEED/(4*(F_BW/(MAX_RANGE/LIGHT_SPEED)));
+      double range_estimated = frequency_max * freq_to_range;
+
+	//((max_idx+1-output_tx.size())/(FS_RX*NOS_RX))*LIGHT_SPEED/2;
 
       if (DEBUG_FLAG)
 	{
 	  cout << "************************" << endl;
 	  cout << "** Resultados Finales **" << endl;
 	  cout << "************************" << endl;
+	  cout << "Bin de la FFT " << max_idx << endl;
+	  cout << "Frecuencia de la FFT " << frequency_max << endl;
+	  cout << "Frecuencia a Rango " << freq_to_range << endl;
 	  cout << "Distance Expected: " << ranges[ii] << endl;
-	  cout << "Distance Measured: " << distance << endl;
+	  cout << "Distance Measured: " << range_estimated << endl;
 	  cout << "Power Detected: " << max_value << endl;
 	}
     }  

@@ -57,7 +57,7 @@ private:
 
   // Params
   int MAX_RANGE,NOS;
-  double FS, POWER_TX, F_BW,F_MIN,T_MOD;
+  double FS, POWER_TX, F_BW,F_MIN;
   
   // Variables
 
