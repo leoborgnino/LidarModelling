@@ -98,7 +98,7 @@ int main ()
   // ::: Procesamiento del Transceptor ::: //
   ///////////////////////////////////////////
 
-  vector<double> ranges{10,30,50,80}; // From Simulator
+  vector<double> ranges{10,30,50,80,100}; // From Simulator
   //vector<double> ranges{10}; // From Simulator
 
   for (unsigned int ii = 0; ii<ranges.size(); ii++)
