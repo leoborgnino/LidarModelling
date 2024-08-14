@@ -1,18 +1,21 @@
 import tkinter as tk
 from tkinter import *
 from lidar_json import *
-
+from PIL import Image, ImageTk  # Importar Pillow para manejar imágenes
 
 #clase para almacenar la configuracion 
-class config_gui:
+class ConfigGui:
     def __init__(self):
         #labels a mostrar en interfaz, e inputs del usuario
         self.sim_configs_texts = ['Cantidad de datos: ','Datos por segundo: ']
-        self.sim_config_default_values = ['1000','1']
+        self.sim_config_default_values = ['20','1']
         self.sim_config_inputs = []
 
-        self.sim_maps_texts = ["Town01", "Town02", "Town03", "Town04","Town05","Town06","Town07"]
+        self.sim_maps_texts = ["Town01", "Town02", "Town03", "Town04","Town05","Town06","Town07","Town10","Town11","Town12"]
         self.sim_map_selected = "Town01"
+
+        self.sim_clima_texts = ["Soleado", "Niebla", "Lluvia"]
+        self.sim_clima_selected = "Soleado"
 
         self.sim_objects_texts = ['Automoviles: ','Cilistas: ', 'Peatones: ']
         self.sim_objects_default_values = ['60','8','30']
@@ -23,7 +26,7 @@ class config_gui:
                             'Probabilidad general de dropoff: ', 'Intensidad limite de dropoff: ', 'Probabilidad de dropoff para intensidad cero: ' ]
         self.lidar_config_inputs = []
         
-        self.lidar_models_texts = ['Modelado de angulo de incidencia', 'Modelado de reflectancia de materiales','Modelado de funcion de limites de reflectancia (a+b.r^2)']
+        self.lidar_models_texts = ['Modelado de angulo de incidencia', 'Modelado de reflectancia de materiales','Modelado de funcion de limites de reflectancia (a+b.r^2)', 'Modelado Transceptor', 'Guardar señal resuelta en el tiempo']
         self.lidar_models_selected = []
 
         self.lidar_limit_coeff_texts = ['Coeficiente a: ','Coeficiente b: ']
@@ -31,7 +34,7 @@ class config_gui:
 
         #configuraciones de lidars
         self.HDL_64e_config = ['2.0', '-24.8', '64', '120.0', '133333', '0.015', '0.05', '0.004', '0.0', '0.0', '0.0']
-        self.HDL_64e_models = [True,True,True] 
+        self.HDL_64e_models = [True,True,True,False,False] 
         self.HDL_64e_limit_coeff = ['0.0005','0.000054']
 
         #configuraciones almacenadas
@@ -61,7 +64,7 @@ class config_gui:
             texto.grid(row=fila_actual,column=columna_inicial)
             text_labels.append(texto)
 
-            input = tk.Entry(ventana)
+            input = tk.Entry(ventana, width=10)
             if default_values is not None:
                 input.insert(0, default_values[i])
             input.grid(row=fila_actual,column=columna_inicial+1)
@@ -70,17 +73,28 @@ class config_gui:
 
         return fila_actual
     
-    def create_multiple_choice(self,ventana,fila_inicial,columna_inicial,texts,saved_option):
+    def create_multiple_choice_vertical(self,ventana,fila_inicial,columna_inicial,texts,saved_option,columns=1):
 
-        fila_actual = fila_inicial
+        for j in range(columns):
+            fila_actual = fila_inicial
+            for i, opcion in enumerate(texts[j*int(len(texts)/columns):(j+1)*int(len(texts)/columns)]):
+                radiobutton = tk.Radiobutton(ventana, text=opcion, variable=saved_option, value=opcion, padx=0, pady=0)
+                radiobutton.grid(row=fila_actual, column=columna_inicial+1+j,padx=0, pady=0)
+                fila_actual += 1
+
+        return fila_actual
+
+    def create_multiple_choice_horizontal(self,ventana,fila_inicial,columna_inicial,texts,saved_option):
+
+        columna_actual = columna_inicial
 
         for i, opcion in enumerate(texts):
             radiobutton = tk.Radiobutton(ventana, text=opcion, variable=saved_option, value=opcion, padx=0, pady=0)
-            radiobutton.grid(row=fila_actual, column=columna_inicial+1,padx=0, pady=0)
-            fila_actual += 1
+            radiobutton.grid(row=fila_inicial, column=columna_actual+1,padx=0, pady=0)
+            columna_actual += 1
 
-        return fila_actual
-    
+        return columna_actual
+
     def create_checks(self,ventana,fila_inicial,columna_inicial,texts,check_values):
         fila_actual = fila_inicial
 
@@ -95,14 +109,9 @@ class config_gui:
 
     
     def boton_comenzar(self,ventana):
-        sim_configs = []
         sim_objects = []
-
-        for input in self.sim_config_inputs:
-            sim_configs.append(input.get())
-        self.sim_configs = sim_configs
         
-        self.sim_map.append(self.sim_map_selected.get())
+        self.sim_map.append(self.sim_map_selected)
 
         for input in self.sim_objects_inputs:
             sim_objects.append(input.get())
@@ -135,6 +144,14 @@ class config_gui:
         print(self.lidar_models)
         print(self.lidar_limit_coeff)
 
+    def boton_config_datos(self):
+        datos_configs = []
+
+        for input in self.sim_config_inputs:
+            datos_configs.append(input.get())
+        self.sim_configs = datos_configs
+
+        print(datos_configs)
     
     #completar los campos de configuracion del lidar
     def set_lidar_config(self,lidar_config,lidar_models,lidar_limit_coeff):
@@ -199,7 +216,7 @@ class config_gui:
 
     def crear_ventana_config_lidar(self):
         ventana_config_lidar = tk.Toplevel()
-
+        ventana_config_lidar.title('Configuración Lidar - Fundación Fulgor')
         #crear los campos de texto para configurar el lidar
         fila_actual = 0
         columna_inicial = 0
@@ -225,17 +242,53 @@ class config_gui:
         self.set_lidar_config(self.HDL_64e_config,self.HDL_64e_models,self.HDL_64e_limit_coeff)
 
         ventana_config_lidar.mainloop()
-    
+
+    def crear_ventana_config_datos(self):
+        ventana_config_datos = tk.Toplevel()
+        ventana_config_datos.title('Configuración Datos - Fundación Fulgor')
+        #crear los campos de texto para configurar el lidar
+        fila_actual = 0
+        columna_inicial = 0
+
+        boton_configs = tk.Button(ventana_config_datos, text="Configs guardadas", command=self.crear_ventana_config_datos)
+        boton_configs.grid(row=fila_actual, column=columna_inicial+1)
+        fila_actual += 1 
+
+        #fila_actual = self.create_text_boxs(ventana_config_datos,fila_actual,columna_inicial,self.datos_configs_texts,self.datos_config_inputs)
+
+        #checkbuttons para habilitar modelados
+        #fila_actual = self.create_checks(ventana_config_lidar,fila_actual,columna_inicial,self.lidar_models_texts,self.lidar_models_selected)
+        
+        #Campos para funcion de limites de reflectance
+        #fila_actual = self.create_text_boxs(ventana_config_lidar,fila_actual,columna_inicial,self.lidar_limit_coeff_texts,self.lidar_limit_coeff_inputs)
+        #OPCIONES A CONFIGURAR
+        fila_actual = self.create_text_boxs(ventana_config_datos,fila_actual,columna_inicial,self.sim_configs_texts,self.sim_config_inputs,self.sim_config_default_values)
+
+        boton_save_config_datos = tk.Button(ventana_config_datos, text="Confirmar configuracion", command=self.boton_config_datos)
+        boton_save_config_datos.grid(row=fila_actual, column=columna_inicial)
+        boton_configs = tk.Button(ventana_config_datos, text="Guardar configuracion", command=self.crear_ventana_save_config)
+        boton_configs.grid(row=fila_actual, column=columna_inicial+1)
+        
+
+        #config por defecto (HDL 64e)
+        #self.set_lidar_config(self.HDL_64e_config,self.HDL_64e_models,self.HDL_64e_limit_coeff)
+
+        ventana_config_datos.mainloop()
+
     def split_lidar_config(self,config):
         lidar_configs = []
         lidar_models = []
         lidar_limit_coeff = []
 
-        for p in config[0:11]:
+        configs = len(self.lidar_configs) # 11
+        models = len(self.lidar_models) # 4
+        limit_coeff = len(self.lidar_limit_coeff) # 2
+
+        for p in config[0:configs]:
             lidar_configs.append(p)
-        for p in config[11:14]:
+        for p in config[configs:configs+models]:
             lidar_models.append(p)
-        for p in config[14:16]:
+        for p in config[configs+models:configs+models+limit_coeff]:
             lidar_limit_coeff.append(p)
 
         return lidar_configs,lidar_models,lidar_limit_coeff
@@ -270,45 +323,68 @@ class config_gui:
 
     def ventana_principal(self):
         ventana = tk.Tk()
+        ventana.title('Configuración Simulador - Fundación Fulgor')
 
+        # Cargar la imagen usando PIL (esto es necesario para manejar formatos como JPG, PNG, etc.)
+        imagen = Image.open("fulgor_edited_medium.jpg")  # Reemplaza con la ruta de tu imagen
+        imagen = imagen.resize((166*2, 62*2))  # Redimensionar la imagen si es necesario
+        imagen_tk = ImageTk.PhotoImage(imagen)
+
+        # Crear un Label para mostrar la imagen
+        label_imagen = tk.Label(ventana, image=imagen_tk)
+        label_imagen.grid(row=0, column=0, columnspan=4)  # Colocar la imagen en la parte superior
+
+        fila_actual = 1
         columna_inicial = 0
-        #OPCIONES A CONFIGURAR
-        fila_actual = 0
-        fila_actual = self.create_text_boxs(ventana,fila_actual,columna_inicial,self.sim_configs_texts,self.sim_config_inputs,self.sim_config_default_values)
 
         #SELECCION DE MAPA
-        self.sim_map_selected = tk.StringVar()
+        print(fila_actual)
         texto = tk.Label(ventana, text='Mapa:')
         texto.grid(row=fila_actual,column=columna_inicial)
-        fila_actual = self.create_multiple_choice(ventana,fila_actual,columna_inicial, \
-                                                  self.sim_maps_texts,self.sim_map_selected)
+
+        fila_actual = self.create_multiple_choice_vertical(ventana,fila_actual,columna_inicial, \
+                                                  self.sim_maps_texts,self.sim_map_selected, 2)
+
+        #SELECCION DE CLIMA
+        texto = tk.Label(ventana, text='Clima:')
+        texto.grid(row=fila_actual,column=columna_inicial)
+
+        self.create_multiple_choice_horizontal(ventana,fila_actual,columna_inicial, \
+                                                  self.sim_clima_texts,self.sim_clima_selected)
+        fila_actual += 2
 
         #CANTIDAD DE CADA OBJETO
-        texto = tk.Label(ventana, text='Porcentajes de densidad de objetos')
-        texto.grid(row=fila_actual,column=columna_inicial)
+        texto = tk.Label(ventana, text='Actores')
+        texto.grid(row=fila_actual,column=columna_inicial+1)
         fila_actual += 1
 
         fila_actual = self.create_text_boxs(ventana,fila_actual,columna_inicial, \
                                             self.sim_objects_texts,self.sim_objects_inputs,self.sim_objects_default_values)
         
+
+
         #BOTONES
         # boton comenzar
         boton_comenzar = tk.Button(ventana, text="Comenzar", command=lambda: self.boton_comenzar(ventana))
-        boton_comenzar.grid(row=fila_actual, column=columna_inicial+1)
+        boton_comenzar.grid(row=fila_actual+2, column=columna_inicial+1)
         # boton para configurar lidar, abre nueva ventana
-        boton_config_lidar = tk.Button(ventana, text="Configurar LiDAR", command=self.crear_ventana_config_lidar)
-        boton_config_lidar.grid(row=fila_actual, column=columna_inicial)
+        boton_configs_lidar = tk.Button(ventana, text="Configurar LiDAR", command=self.crear_ventana_config_lidar)
+        boton_configs_lidar.grid(row=fila_actual, column=columna_inicial)
+        # boton para configurar lidar, abre nueva ventana
+        boton_configs_datos = tk.Button(ventana, text="Configurar Datos", command=self.crear_ventana_config_datos)
+        boton_configs_datos.grid(row=fila_actual, column=columna_inicial+1)
 
         # Iniciar el bucle de eventos de la ventana
         ventana.mainloop()
 
         sim_all_configs = self.sim_configs + self.sim_map + self.sim_objects
+        print(sim_all_configs)
         lidar_all_configs = self.lidar_configs + self.lidar_models + self.lidar_limit_coeff
 
         return sim_all_configs,lidar_all_configs
 
 if __name__ == "__main__":
-    interfaz = config_gui()
+    interfaz = ConfigGui()
 
     print(interfaz.ventana_principal())
 

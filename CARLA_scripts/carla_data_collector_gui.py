@@ -31,7 +31,7 @@ from carla_utils import generate_lidar_bp,generate_lidar_bp_by_gui,generate_came
 
 from kitti_label import KittiLabel, generate_kittilabel
 
-from config_gui import config_gui
+from config_gui import ConfigGui
 
 """ OUTPUT FOLDERS """
 OUTPUT_FOLDER = "training"
@@ -403,13 +403,14 @@ def run_data_collect(map,client,images_path,pointclouds_path,pointclouds_carla_p
 
 def main(arg):
 
-    #interfaz grafica para cargar la configuracion
-    interfaz = config_gui()
+    # Interfaz Gráfica
+    interfaz = ConfigGui()
     sim_all_configs,lidar_all_configs = interfaz.ventana_principal()
 
     print(sim_all_configs)
     print(lidar_all_configs)
 
+    ## Configuracion en base a la interfaz gráfica
     frames_per_map = int(sim_all_configs[0])
     interval_between_frames = int(sim_all_configs[1])
     map = sim_all_configs[2]

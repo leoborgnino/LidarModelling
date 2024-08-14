@@ -42,11 +42,22 @@ def generate_lidar_bp_by_gui(blueprint_library,delta,lidar_all_configs):
     lidar_bp.set_attribute('dropoff_general_rate', lidar_all_configs[8])
     lidar_bp.set_attribute('dropoff_intensity_limit', lidar_all_configs[9])
     lidar_bp.set_attribute('dropoff_zero_intensity',lidar_all_configs[10])
+    lidar_bp.set_attribute('tx_fs',str(30000000));
+    lidar_bp.set_attribute('debug_global',"false")
+    #lidar_bp.set_attribute('debug_rx',"true")
+    lidar_bp.set_attribute('log_rx',"false")
     #lidar_bp.set_attribute('sensor_tick', str(0.1)) #si es el doble q delta, va a dar un dato cada 2 ticks
     if(lidar_all_configs[11]):
         lidar_bp.set_attribute('model_angle', 'true')
+        lidar_bp.set_attribute('model_intensity', 'true')
     if(lidar_all_configs[12]):
         lidar_bp.set_attribute('model_material', 'true')
+        lidar_bp.set_attribute('model_intensity', 'true')
+    if(lidar_all_configs[14]):
+        print("MODEL TRANSCEPTOR")
+        lidar_bp.set_attribute('model_transceptor', 'true')
+    if(lidar_all_configs[15]):
+        lidar_bp.set_attribute('log_rx', 'true')
     #if(lidar_all_configs[13]):
     #    lidar_bp.set_attribute('model_reflectance_limits_function', 'true')
     #    lidar_bp.set_attribute('reflectance_limits_function_coeff_a', lidar_all_configs[14])
