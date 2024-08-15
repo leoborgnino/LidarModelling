@@ -6,16 +6,20 @@ from PIL import Image, ImageTk  # Importar Pillow para manejar imágenes
 #clase para almacenar la configuracion 
 class ConfigGui:
     def __init__(self):
+        self.ventana = tk.Tk()
         #labels a mostrar en interfaz, e inputs del usuario
         self.sim_configs_texts = ['Cantidad de datos: ','Datos por segundo: ']
         self.sim_config_default_values = ['20','1']
         self.sim_config_inputs = []
 
+        self.data_output_type_texts = ["KITTI","RX RT","RX REF","PCD"]
+        self.data_output_type_selected = tk.StringVar(value="KITTI")
+
         self.sim_maps_texts = ["Town01", "Town02", "Town03", "Town04","Town05","Town06","Town07","Town10","Town11","Town12"]
-        self.sim_map_selected = "Town01"
+        self.sim_map_selected = tk.StringVar(value="Town01")
 
         self.sim_clima_texts = ["Soleado", "Niebla", "Lluvia"]
-        self.sim_clima_selected = "Soleado"
+        self.sim_clima_selected = tk.StringVar(value="Soleado")
 
         self.sim_objects_texts = ['Automoviles: ','Cilistas: ', 'Peatones: ']
         self.sim_objects_default_values = ['60','8','30']
@@ -111,7 +115,7 @@ class ConfigGui:
     def boton_comenzar(self,ventana):
         sim_objects = []
         
-        self.sim_map.append(self.sim_map_selected)
+        self.sim_map.append(self.sim_map_selected.get())
 
         for input in self.sim_objects_inputs:
             sim_objects.append(input.get())
@@ -149,6 +153,9 @@ class ConfigGui:
 
         for input in self.sim_config_inputs:
             datos_configs.append(input.get())
+
+        datos_configs.append(self.data_output_type_selected.get())
+            
         self.sim_configs = datos_configs
 
         print(datos_configs)
@@ -250,24 +257,19 @@ class ConfigGui:
         fila_actual = 0
         columna_inicial = 0
 
-        boton_configs = tk.Button(ventana_config_datos, text="Configs guardadas", command=self.crear_ventana_config_datos)
-        boton_configs.grid(row=fila_actual, column=columna_inicial+1)
-        fila_actual += 1 
-
-        #fila_actual = self.create_text_boxs(ventana_config_datos,fila_actual,columna_inicial,self.datos_configs_texts,self.datos_config_inputs)
-
-        #checkbuttons para habilitar modelados
-        #fila_actual = self.create_checks(ventana_config_lidar,fila_actual,columna_inicial,self.lidar_models_texts,self.lidar_models_selected)
-        
-        #Campos para funcion de limites de reflectance
-        #fila_actual = self.create_text_boxs(ventana_config_lidar,fila_actual,columna_inicial,self.lidar_limit_coeff_texts,self.lidar_limit_coeff_inputs)
         #OPCIONES A CONFIGURAR
         fila_actual = self.create_text_boxs(ventana_config_datos,fila_actual,columna_inicial,self.sim_configs_texts,self.sim_config_inputs,self.sim_config_default_values)
 
+        texto = tk.Label(ventana_config_datos, text='Tipo de Datos de Salida:')
+        texto.grid(row=fila_actual,column=columna_inicial)
+        fila_actual = self.create_multiple_choice_vertical(ventana_config_datos,fila_actual,columna_inicial, \
+                                                           self.data_output_type_texts,self.data_output_type_selected, 1)
+
+
         boton_save_config_datos = tk.Button(ventana_config_datos, text="Confirmar configuracion", command=self.boton_config_datos)
         boton_save_config_datos.grid(row=fila_actual, column=columna_inicial)
-        boton_configs = tk.Button(ventana_config_datos, text="Guardar configuracion", command=self.crear_ventana_save_config)
-        boton_configs.grid(row=fila_actual, column=columna_inicial+1)
+        #boton_configs = tk.Button(ventana_config_datos, text="Guardar configuracion", command=self.crear_ventana_save_config)
+        #boton_configs.grid(row=fila_actual, column=columna_inicial+1)
         
 
         #config por defecto (HDL 64e)
@@ -322,8 +324,7 @@ class ConfigGui:
 
 
     def ventana_principal(self):
-        ventana = tk.Tk()
-        ventana.title('Configuración Simulador - Fundación Fulgor')
+        self.ventana.title('Configuración Simulador - Fundación Fulgor')
 
         # Cargar la imagen usando PIL (esto es necesario para manejar formatos como JPG, PNG, etc.)
         imagen = Image.open("fulgor_edited_medium.jpg")  # Reemplaza con la ruta de tu imagen
@@ -331,7 +332,7 @@ class ConfigGui:
         imagen_tk = ImageTk.PhotoImage(imagen)
 
         # Crear un Label para mostrar la imagen
-        label_imagen = tk.Label(ventana, image=imagen_tk)
+        label_imagen = tk.Label(self.ventana, image=imagen_tk)
         label_imagen.grid(row=0, column=0, columnspan=4)  # Colocar la imagen en la parte superior
 
         fila_actual = 1
@@ -339,43 +340,43 @@ class ConfigGui:
 
         #SELECCION DE MAPA
         print(fila_actual)
-        texto = tk.Label(ventana, text='Mapa:')
+        texto = tk.Label(self.ventana, text='Mapa:')
         texto.grid(row=fila_actual,column=columna_inicial)
 
-        fila_actual = self.create_multiple_choice_vertical(ventana,fila_actual,columna_inicial, \
+        fila_actual = self.create_multiple_choice_vertical(self.ventana,fila_actual,columna_inicial, \
                                                   self.sim_maps_texts,self.sim_map_selected, 2)
 
         #SELECCION DE CLIMA
-        texto = tk.Label(ventana, text='Clima:')
+        texto = tk.Label(self.ventana, text='Clima:')
         texto.grid(row=fila_actual,column=columna_inicial)
 
-        self.create_multiple_choice_horizontal(ventana,fila_actual,columna_inicial, \
+        self.create_multiple_choice_horizontal(self.ventana,fila_actual,columna_inicial, \
                                                   self.sim_clima_texts,self.sim_clima_selected)
         fila_actual += 2
 
         #CANTIDAD DE CADA OBJETO
-        texto = tk.Label(ventana, text='Actores')
+        texto = tk.Label(self.ventana, text='Actores')
         texto.grid(row=fila_actual,column=columna_inicial+1)
         fila_actual += 1
 
-        fila_actual = self.create_text_boxs(ventana,fila_actual,columna_inicial, \
+        fila_actual = self.create_text_boxs(self.ventana,fila_actual,columna_inicial, \
                                             self.sim_objects_texts,self.sim_objects_inputs,self.sim_objects_default_values)
         
 
 
         #BOTONES
         # boton comenzar
-        boton_comenzar = tk.Button(ventana, text="Comenzar", command=lambda: self.boton_comenzar(ventana))
+        boton_comenzar = tk.Button(self.ventana, text="Comenzar", command=lambda: self.boton_comenzar(self.ventana))
         boton_comenzar.grid(row=fila_actual+2, column=columna_inicial+1)
-        # boton para configurar lidar, abre nueva ventana
-        boton_configs_lidar = tk.Button(ventana, text="Configurar LiDAR", command=self.crear_ventana_config_lidar)
+        # boton para configurar lidar, abre nueva self.ventana
+        boton_configs_lidar = tk.Button(self.ventana, text="Configurar LiDAR", command=self.crear_ventana_config_lidar)
         boton_configs_lidar.grid(row=fila_actual, column=columna_inicial)
         # boton para configurar lidar, abre nueva ventana
-        boton_configs_datos = tk.Button(ventana, text="Configurar Datos", command=self.crear_ventana_config_datos)
+        boton_configs_datos = tk.Button(self.ventana, text="Configurar Datos", command=self.crear_ventana_config_datos)
         boton_configs_datos.grid(row=fila_actual, column=columna_inicial+1)
 
         # Iniciar el bucle de eventos de la ventana
-        ventana.mainloop()
+        self.ventana.mainloop()
 
         sim_all_configs = self.sim_configs + self.sim_map + self.sim_objects
         print(sim_all_configs)

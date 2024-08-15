@@ -413,8 +413,8 @@ def main(arg):
     ## Configuracion en base a la interfaz gráfica
     frames_per_map = int(sim_all_configs[0])
     interval_between_frames = int(sim_all_configs[1])
-    map = sim_all_configs[2]
-    porcentajes_objetos = [float(sim_all_configs[3]),float(sim_all_configs[4]),float(sim_all_configs[5])]
+    map = sim_all_configs[3]
+    porcentajes_objetos = [float(sim_all_configs[4]),float(sim_all_configs[5]),float(sim_all_configs[6])]
 
     """Spawnea el LIDAR HDL-64E y una camara RGB en un vehiculo, y genera un paso de simulacion"""
     #Cliente y simulador
