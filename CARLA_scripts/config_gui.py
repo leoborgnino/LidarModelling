@@ -28,9 +28,15 @@ class ConfigGui:
         self.lidar_configs_texts = ['FOV Vertical superior: ', 'FOV Vertical inferior: ', 'Canales: ', 'Rango: ', 'Frecuencia', 'FOV Horizonal', 'FOV Horizontal Step' ]
         self.lidar_config_inputs = []
         
-        self.lidar_models_texts = ['Modelado de Efectos de Reflexión', 'Modelado de Efectos Climáticos', 'Modelado Transceptor']
-        self.lidar_models_selected = []
+        self.lidar_models_texts = ['Modelado de Reflexión', 'Modelado Climatico', 'Modelado Transceptor']
+        self.lidar_models_selected = [tk.BooleanVar(value=True),tk.BooleanVar(value=True),tk.BooleanVar(value=True)]
 
+        self.lidar_beam_type_texts = ["Puntual","Gaussiana","Rectangular"]
+        self.lidar_beam_type_selected = tk.StringVar(value="Puntual")
+
+        self.architecture_texts = ["DD Pulsada", "DC FMCW"]
+        self.architecture_selected = tk.StringVar(value="DD Pulsada")
+        
         #self.lidar_limit_coeff_texts = ['Coeficiente a: ','Coeficiente b: ']
         #self.lidar_limit_coeff_inputs = []
 
@@ -106,6 +112,20 @@ class ConfigGui:
             check = tk.Checkbutton(ventana, text=text, variable=value)
             check.grid(row=fila_actual,column=columna_inicial)
             fila_actual+=1
+        
+        return fila_actual
+
+    def create_checks_horizontal(self,ventana,fila_inicial,columna_inicial,texts,check_values):
+        fila_actual = fila_inicial
+        columna_actual = columna_inicial+1
+
+        for i,text in enumerate(texts):
+            #value = tk.BooleanVar()
+            #check_values.append(value)
+            check = tk.Checkbutton(ventana, text=text, variable=check_values[i])
+            check.grid(row=fila_actual,column=columna_actual)
+            columna_actual +=1
+        fila_actual+=1
         
         return fila_actual
 
@@ -233,8 +253,22 @@ class ConfigGui:
         fila_actual = self.create_text_boxs(ventana_config_lidar,fila_actual,columna_inicial,self.lidar_configs_texts,self.lidar_config_inputs)
 
         #checkbuttons para habilitar modelados
-        fila_actual = self.create_checks(ventana_config_lidar,fila_actual,columna_inicial,self.lidar_models_texts,self.lidar_models_selected)
-        
+        texto = tk.Label(ventana_config_lidar, text='Modelado de Efectos:')
+        texto.grid(row=fila_actual,column=columna_inicial)
+        fila_actual = self.create_checks_horizontal(ventana_config_lidar,fila_actual,columna_inicial,self.lidar_models_texts,self.lidar_models_selected)
+
+        texto = tk.Label(ventana_config_lidar, text='Divergencia del Haz:')
+        texto.grid(row=fila_actual,column=columna_inicial)
+        self.create_multiple_choice_horizontal(ventana_config_lidar,fila_actual,columna_inicial, \
+                                                  self.lidar_beam_type_texts,self.lidar_beam_type_selected)
+        fila_actual += 1
+
+        texto = tk.Label(ventana_config_lidar, text='Arquitectura:')
+        texto.grid(row=fila_actual,column=columna_inicial)
+        self.create_multiple_choice_horizontal(ventana_config_lidar,fila_actual,columna_inicial, \
+                                                  self.architecture_texts,self.architecture_selected)
+        fila_actual += 2
+
         #Campos para funcion de limites de reflectance
         #fila_actual = self.create_text_boxs(ventana_config_lidar,fila_actual,columna_inicial,self.lidar_limit_coeff_texts,self.lidar_limit_coeff_inputs)
 
