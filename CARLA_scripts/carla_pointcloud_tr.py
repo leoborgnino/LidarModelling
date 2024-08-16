@@ -138,7 +138,7 @@ def main(arg):
         lidar_bp.set_attribute('ch_fs',str(1e9))
         lidar_bp.set_attribute('rx_fs',str(1e9))
         lidar_bp.set_attribute('debug_global',"true")
-        #lidar_bp.set_attribute('debug_rx',"true")
+        lidar_bp.set_attribute('debug_rx',"true")
         lidar_bp.set_attribute('log_rx',"false")
         lidar_bp.set_attribute('model_transceptor',"false")
         lidar_bp.set_attribute('model_intensity',"true")

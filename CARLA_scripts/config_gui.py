@@ -25,26 +25,24 @@ class ConfigGui:
         self.sim_objects_default_values = ['60','8','30']
         self.sim_objects_inputs = []
 
-        self.lidar_configs_texts = ['FOV superior: ', 'FOV inferior: ', 'Canales: ', 'Rango: ', 'Puntos por rotacion: ', \
-                            'Ruido de distancia (desv. std.): ', 'Ruido de intensidad (desv. std.): ', 'Tasa de atenuacion atmosferica de intensidad: ', \
-                            'Probabilidad general de dropoff: ', 'Intensidad limite de dropoff: ', 'Probabilidad de dropoff para intensidad cero: ' ]
+        self.lidar_configs_texts = ['FOV Vertical superior: ', 'FOV Vertical inferior: ', 'Canales: ', 'Rango: ', 'Frecuencia', 'FOV Horizonal', 'FOV Horizontal Step' ]
         self.lidar_config_inputs = []
         
-        self.lidar_models_texts = ['Modelado de angulo de incidencia', 'Modelado de reflectancia de materiales','Modelado de funcion de limites de reflectancia (a+b.r^2)', 'Modelado Transceptor', 'Guardar señal resuelta en el tiempo']
+        self.lidar_models_texts = ['Modelado de Efectos de Reflexión', 'Modelado de Efectos Climáticos', 'Modelado Transceptor']
         self.lidar_models_selected = []
 
-        self.lidar_limit_coeff_texts = ['Coeficiente a: ','Coeficiente b: ']
-        self.lidar_limit_coeff_inputs = []
+        #self.lidar_limit_coeff_texts = ['Coeficiente a: ','Coeficiente b: ']
+        #self.lidar_limit_coeff_inputs = []
 
         #configuraciones de lidars
-        self.HDL_64e_config = ['2.0', '-24.8', '64', '120.0', '133333', '0.015', '0.05', '0.004', '0.0', '0.0', '0.0']
-        self.HDL_64e_models = [True,True,True,False,False] 
-        self.HDL_64e_limit_coeff = ['0.0005','0.000054']
+        self.HDL_64e_config = ['2.0', '-24.8', '64', '120.0']
+        self.HDL_64e_models = [True,True,False] 
+        #self.HDL_64e_limit_coeff = ['0.0005','0.000054']
 
         #configuraciones almacenadas
         self.lidar_configs = self.HDL_64e_config
         self.lidar_models = self.HDL_64e_models
-        self.lidar_limit_coeff = self.HDL_64e_limit_coeff
+        #self.lidar_limit_coeff = self.HDL_64e_limit_coeff
  
         self.sim_configs = []
         self.sim_map = []
@@ -130,7 +128,7 @@ class ConfigGui:
     def boton_config_lidar(self):
         lidar_configs = []
         lidar_models = []
-        lidar_limit_coeff = []
+        #lidar_limit_coeff = []
 
         for input in self.lidar_config_inputs:
             lidar_configs.append(input.get())
@@ -140,13 +138,13 @@ class ConfigGui:
             lidar_models.append(input.get())
         self.lidar_models = lidar_models
 
-        for input in self.lidar_limit_coeff_inputs:
-            lidar_limit_coeff.append(input.get())
-        self.lidar_limit_coeff = lidar_limit_coeff
+        #for input in self.lidar_limit_coeff_inputs:
+        #    lidar_limit_coeff.append(input.get())
+        #self.lidar_limit_coeff = lidar_limit_coeff
 
         print(self.lidar_configs)
         print(self.lidar_models)
-        print(self.lidar_limit_coeff)
+        #print(self.lidar_limit_coeff)
 
     def boton_config_datos(self):
         datos_configs = []
@@ -161,13 +159,13 @@ class ConfigGui:
         print(datos_configs)
     
     #completar los campos de configuracion del lidar
-    def set_lidar_config(self,lidar_config,lidar_models,lidar_limit_coeff):
+    def set_lidar_config(self,lidar_config,lidar_models):
         for i,input in enumerate(self.lidar_config_inputs):
             input.insert(0,lidar_config[i])
         for i,value in enumerate(self.lidar_models_selected):
             value.set(lidar_models[i])
-        for i,input in enumerate(self.lidar_limit_coeff_inputs):
-            input.insert(0,lidar_limit_coeff[i])
+        #for i,input in enumerate(self.lidar_limit_coeff_inputs):
+        #    input.insert(0,lidar_limit_coeff[i])
 
     #limpiar los campos de configuracion del lidar
     def reset_lidar_config(self):
@@ -175,19 +173,19 @@ class ConfigGui:
             input.delete(0,END)
         for value in self.lidar_models_selected:
             value.set(False)
-        for input in self.lidar_limit_coeff_inputs:
-            input.delete(0,END)
+        #for input in self.lidar_limit_coeff_inputs:
+        #    input.delete(0,END)
     
-    def boton_set_lidar_config(self,lidar_configs,lidar_models,lidar_limit_coeff):
+    def boton_set_lidar_config(self,lidar_configs,lidar_models):
         self.reset_lidar_config()
-        self.set_lidar_config(lidar_configs,lidar_models,lidar_limit_coeff)
+        self.set_lidar_config(lidar_configs,lidar_models)
 
     def save_config(self,input_name):
         print(input_name.get())
         name = input_name.get()
         lidar_configs = []
         lidar_models = []
-        lidar_limit_coeff = []
+        #lidar_limit_coeff = []
 
         for input in self.lidar_config_inputs:
             lidar_configs.append(input.get())
@@ -195,10 +193,10 @@ class ConfigGui:
         for input in self.lidar_models_selected:
             lidar_models.append(input.get())
 
-        for input in self.lidar_limit_coeff_inputs:
-            lidar_limit_coeff.append(input.get())
+        #for input in self.lidar_limit_coeff_inputs:
+        #    lidar_limit_coeff.append(input.get())
 
-        lidar_all_configs = lidar_configs + lidar_models + lidar_limit_coeff
+        lidar_all_configs = lidar_configs + lidar_models
 
         save_lidar_config_json(name,lidar_all_configs)
 
@@ -238,7 +236,7 @@ class ConfigGui:
         fila_actual = self.create_checks(ventana_config_lidar,fila_actual,columna_inicial,self.lidar_models_texts,self.lidar_models_selected)
         
         #Campos para funcion de limites de reflectance
-        fila_actual = self.create_text_boxs(ventana_config_lidar,fila_actual,columna_inicial,self.lidar_limit_coeff_texts,self.lidar_limit_coeff_inputs)
+        #fila_actual = self.create_text_boxs(ventana_config_lidar,fila_actual,columna_inicial,self.lidar_limit_coeff_texts,self.lidar_limit_coeff_inputs)
 
         boton_save_config_lidar = tk.Button(ventana_config_lidar, text="Confirmar configuracion", command=self.boton_config_lidar)
         boton_save_config_lidar.grid(row=fila_actual, column=columna_inicial)
@@ -246,7 +244,7 @@ class ConfigGui:
         boton_configs.grid(row=fila_actual, column=columna_inicial+1)
         
         #config por defecto (HDL 64e)
-        self.set_lidar_config(self.HDL_64e_config,self.HDL_64e_models,self.HDL_64e_limit_coeff)
+        self.set_lidar_config(self.HDL_64e_config,self.HDL_64e_models)
 
         ventana_config_lidar.mainloop()
 
@@ -280,29 +278,29 @@ class ConfigGui:
     def split_lidar_config(self,config):
         lidar_configs = []
         lidar_models = []
-        lidar_limit_coeff = []
+        #lidar_limit_coeff = []
 
         configs = len(self.lidar_configs) # 11
         models = len(self.lidar_models) # 4
-        limit_coeff = len(self.lidar_limit_coeff) # 2
+        #limit_coeff = len(self.lidar_limit_coeff) # 2
 
         for p in config[0:configs]:
             lidar_configs.append(p)
         for p in config[configs:configs+models]:
             lidar_models.append(p)
-        for p in config[configs+models:configs+models+limit_coeff]:
-            lidar_limit_coeff.append(p)
+        #for p in config[configs+models:configs+models+limit_coeff]:
+        #    lidar_limit_coeff.append(p)
 
-        return lidar_configs,lidar_models,lidar_limit_coeff
+        return lidar_configs,lidar_models
 
 
     def boton_configs(self,text):
 
         config = lidar_config_to_array(text)
 
-        lidar_configs,lidar_models,lidar_limit_coeff = self.split_lidar_config(config)
+        lidar_configs,lidar_models = self.split_lidar_config(config)
 
-        self.boton_set_lidar_config(lidar_configs,lidar_models,lidar_limit_coeff)
+        self.boton_set_lidar_config(lidar_configs,lidar_models)
 
     def create_config_buttons(self,ventana,fila_inicial,columna_inicial,texts):
         fila_actual=fila_inicial
@@ -380,7 +378,7 @@ class ConfigGui:
 
         sim_all_configs = self.sim_configs + self.sim_map + self.sim_objects
         print(sim_all_configs)
-        lidar_all_configs = self.lidar_configs + self.lidar_models + self.lidar_limit_coeff
+        lidar_all_configs = self.lidar_configs + self.lidar_models
 
         return sim_all_configs,lidar_all_configs
 
