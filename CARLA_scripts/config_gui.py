@@ -55,9 +55,9 @@ class ConfigGui:
         self.trans_dd_emisor_selected = tk.StringVar(value="Gaussiano")
 
         ## Receptor LiDAR
-        self.trans_fmcw_rececptor_objects_texts = ['PRX: ','RPD: ', 'FS: ', 'NOS']
-        self.trans_fmcw_rececptor_objects_default_values = ['1','0.8','2e9','5']
-        self.trans_fmcw_rececptor_objects_inputs = []
+        self.trans_fmcw_receptor_objects_texts = ['PRX: ','RPD: ', 'FS: ', 'NOS']
+        self.trans_fmcw_receptor_objects_default_values = ['1','0.8','2e9','5']
+        self.trans_fmcw_receptor_objects_inputs = []
         
         #configuraciones almacenadas
         self.lidar_configs = self.HDL_64e_config
@@ -114,7 +114,7 @@ class ConfigGui:
             radiobutton.grid(row=fila_inicial, column=columna_actual+1,padx=0, pady=0)
             columna_actual += 1
 
-        return columna_actual
+        return fila_inicial+1
 
     def create_checks(self,ventana,fila_inicial,columna_inicial,texts,check_values):
         fila_actual = fila_inicial
@@ -133,8 +133,6 @@ class ConfigGui:
         columna_actual = columna_inicial+1
 
         for i,text in enumerate(texts):
-            #value = tk.BooleanVar()
-            #check_values.append(value)
             check = tk.Checkbutton(ventana, text=text, variable=check_values[i])
             check.grid(row=fila_actual,column=columna_actual)
             columna_actual +=1
@@ -161,7 +159,6 @@ class ConfigGui:
     def boton_config_lidar(self):
         lidar_configs = []
         lidar_models = []
-        #lidar_limit_coeff = []
 
         for input in self.lidar_config_inputs:
             lidar_configs.append(input.get())
@@ -171,13 +168,8 @@ class ConfigGui:
             lidar_models.append(input.get())
         self.lidar_models = lidar_models
 
-        #for input in self.lidar_limit_coeff_inputs:
-        #    lidar_limit_coeff.append(input.get())
-        #self.lidar_limit_coeff = lidar_limit_coeff
-
         print(self.lidar_configs)
         print(self.lidar_models)
-        #print(self.lidar_limit_coeff)
 
     def boton_config_datos(self):
         datos_configs = []
@@ -199,6 +191,9 @@ class ConfigGui:
 
         if (not fmcw):
             transceptor_configs.append(self.trans_dd_emisor_selected.get())
+
+        for input in self.trans_fmcw_receptor_objects_inputs:
+            transceptor_configs.append(input.get())
             
         self.transceptor_configs = transceptor_configs
 
@@ -210,8 +205,6 @@ class ConfigGui:
             input.insert(0,lidar_config[i])
         for i,value in enumerate(self.lidar_models_selected):
             value.set(lidar_models[i])
-        #for i,input in enumerate(self.lidar_limit_coeff_inputs):
-        #    input.insert(0,lidar_limit_coeff[i])
 
     #limpiar los campos de configuracion del lidar
     def reset_lidar_config(self):
@@ -219,8 +212,6 @@ class ConfigGui:
             input.delete(0,END)
         for value in self.lidar_models_selected:
             value.set(False)
-        #for input in self.lidar_limit_coeff_inputs:
-        #    input.delete(0,END)
     
     def boton_set_lidar_config(self,lidar_configs,lidar_models):
         self.reset_lidar_config()
@@ -331,12 +322,6 @@ class ConfigGui:
 
         boton_save_config_datos = tk.Button(ventana_config_datos, text="Confirmar configuracion", command=self.boton_config_datos)
         boton_save_config_datos.grid(row=fila_actual, column=columna_inicial)
-        #boton_configs = tk.Button(ventana_config_datos, text="Guardar configuracion", command=self.crear_ventana_save_config)
-        #boton_configs.grid(row=fila_actual, column=columna_inicial+1)
-        
-
-        #config por defecto (HDL 64e)
-        #self.set_lidar_config(self.HDL_64e_config,self.HDL_64e_models,self.HDL_64e_limit_coeff)
 
         ventana_config_datos.mainloop()
 
@@ -348,16 +333,26 @@ class ConfigGui:
         columna_inicial = 0
 
         #OPCIONES A CONFIGURAR
-        texto = tk.Label(ventana_config_transceptor, text='Configuración Emisor:')
+        texto = tk.Label(ventana_config_transceptor, text='Configuración Emisor',font=("Arial", 14, "bold"))
         texto.grid(row=fila_actual,column=columna_inicial)
         fila_actual+=1
-        print(self.architecture_selected.get())
+        #print(self.architecture_selected.get())
         if (self.architecture_selected.get() == 'DC FMCW'):
             fila_actual = self.create_text_boxs(ventana_config_transceptor,fila_actual,columna_inicial,self.trans_fmcw_emisor_objects_texts,self.trans_emisor_objects_inputs,self.trans_fmcw_emisor_objects_default_values)
         else:
             fila_actual = self.create_text_boxs(ventana_config_transceptor,fila_actual,columna_inicial,self.trans_dd_emisor_objects_texts,self.trans_emisor_objects_inputs,self.trans_dd_emisor_objects_default_values)
+            texto = tk.Label(ventana_config_transceptor, text='Forma de Onda Emisor:')
+            texto.grid(row=fila_actual,column=columna_inicial)
+            fila_actual = self.create_multiple_choice_horizontal(ventana_config_transceptor,fila_actual,columna_inicial,self.trans_dd_emisor_texts,self.trans_dd_emisor_selected)
 
-
+        texto = tk.Label(ventana_config_transceptor, text='Configuración Receptor', anchor='e', font=("Arial", 14, "bold"))
+        texto.grid(row=fila_actual,column=columna_inicial)
+        #texto = tk.Label(ventana_config_transceptor, text=' Receptor', anchor='w',font=("Arial", 14, "bold"))
+        #texto.grid(row=fila_actual,column=columna_inicial+1)
+        fila_actual+=1
+        fila_actual = self.create_text_boxs(ventana_config_transceptor,fila_actual,columna_inicial,self.trans_fmcw_receptor_objects_texts,self.trans_fmcw_receptor_objects_inputs,self.trans_fmcw_receptor_objects_default_values) 
+        fila_actual+=1
+       
         boton_save_config_transceptor = tk.Button(ventana_config_transceptor, text="Confirmar configuracion", command=self.boton_config_transceptor)
         boton_save_config_transceptor.grid(row=fila_actual, column=columna_inicial)
 
@@ -464,9 +459,12 @@ class ConfigGui:
         # Iniciar el bucle de eventos de la ventana
         self.ventana.mainloop()
 
+        print(self.sim_map)
+        print(self.sim_configs)
+        print(self.sim_objects)
         sim_all_configs = self.sim_configs + self.sim_map + self.sim_objects
         print(sim_all_configs)
-        lidar_all_configs = self.lidar_configs + self.lidar_models
+        lidar_all_configs = self.lidar_configs + self.lidar_models + self.transceptor_configs
 
         return sim_all_configs,lidar_all_configs
 
