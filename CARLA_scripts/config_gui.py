@@ -7,14 +7,7 @@ from PIL import Image, ImageTk  # Importar Pillow para manejar imágenes
 class ConfigGui:
     def __init__(self):
         self.ventana = tk.Tk()
-        #labels a mostrar en interfaz, e inputs del usuario
-        self.sim_configs_texts = ['Cantidad de datos: ','Datos por segundo: ']
-        self.sim_config_default_values = ['20','1']
-        self.sim_config_inputs = []
-
-        self.data_output_type_texts = ["KITTI","RX RT","RX REF","PCD"]
-        self.data_output_type_selected = tk.StringVar(value="KITTI")
-
+        # Interfaz Principal
         self.sim_maps_texts = ["Town01", "Town02", "Town03", "Town04","Town05","Town06","Town07","Town10","Town11","Town12"]
         self.sim_map_selected = tk.StringVar(value="Town01")
 
@@ -25,7 +18,16 @@ class ConfigGui:
         self.sim_objects_default_values = ['60','8','30']
         self.sim_objects_inputs = []
 
-        self.lidar_configs_texts = ['FOV Vertical superior: ', 'FOV Vertical inferior: ', 'Canales: ', 'Rango: ', 'Frecuencia', 'FOV Horizonal', 'FOV Horizontal Step' ]
+        # Interfaz Configuracion Base de Datos
+        self.sim_configs_texts = ['Cantidad de datos: ','Datos por segundo: ']
+        self.sim_config_default_values = ['20','1']
+        self.sim_config_inputs = []
+
+        self.data_output_type_texts = ["KITTI","RX RT","RX REF","PCD"]
+        self.data_output_type_selected = tk.StringVar(value="KITTI")
+
+        # Interfaz General LiDAR
+        self.lidar_configs_texts = ['Lambda [m]', 'FOV Vertical superior: ', 'FOV Vertical inferior: ', 'Canales: ', 'Rango: ', 'Frecuencia', 'FOV Horizonal', 'FOV Horizontal Step' ]
         self.lidar_config_inputs = []
         
         self.lidar_models_texts = ['Modelado de Reflexión', 'Modelado Climatico', 'Modelado Transceptor']
@@ -37,24 +39,35 @@ class ConfigGui:
         self.architecture_texts = ["DD Pulsada", "DC FMCW"]
         self.architecture_selected = tk.StringVar(value="DD Pulsada")
         
-        #self.lidar_limit_coeff_texts = ['Coeficiente a: ','Coeficiente b: ']
-        #self.lidar_limit_coeff_inputs = []
-
-        #configuraciones de lidars
+        #configuracion LiDAR por defecto
         self.HDL_64e_config = ['2.0', '-24.8', '64', '120.0']
         self.HDL_64e_models = [True,True,False] 
-        #self.HDL_64e_limit_coeff = ['0.0005','0.000054']
 
+        ## Emisor LiDAR
+        self.trans_fmcw_emisor_objects_texts = ['PTX: ','F_BW: ', 'F_MIN: ', 'FS:', 'NOS']
+        self.trans_fmcw_emisor_objects_default_values = ['50e-3','1e9','0','2e9','5']
+
+        self.trans_dd_emisor_objects_texts = ['PTX: ','TAU_SIGNAL: ', 'FS:', 'NOS']
+        self.trans_dd_emisor_objects_default_values = ['50e-3','5e-9','2e9','5']
+        self.trans_emisor_objects_inputs = []
+
+        self.trans_dd_emisor_texts = ["Rectangular", "Gaussiano"]
+        self.trans_dd_emisor_selected = tk.StringVar(value="Gaussiano")
+
+        ## Receptor LiDAR
+        self.trans_fmcw_rececptor_objects_texts = ['PRX: ','RPD: ', 'FS: ', 'NOS']
+        self.trans_fmcw_rececptor_objects_default_values = ['1','0.8','2e9','5']
+        self.trans_fmcw_rececptor_objects_inputs = []
+        
         #configuraciones almacenadas
         self.lidar_configs = self.HDL_64e_config
         self.lidar_models = self.HDL_64e_models
-        #self.lidar_limit_coeff = self.HDL_64e_limit_coeff
+
+        self.transceptor_configs = []
  
         self.sim_configs = []
         self.sim_map = []
         self.sim_objects = []
-
-        
     
     def set_lidar_config(self, new_lidar_config):
         self.lidar_configs = new_lidar_config
@@ -177,7 +190,20 @@ class ConfigGui:
         self.sim_configs = datos_configs
 
         print(datos_configs)
-    
+
+    def boton_config_transceptor(self, fmcw=False):
+        transceptor_configs = []
+
+        for input in self.trans_emisor_objects_inputs:
+            transceptor_configs.append(input.get())
+
+        if (not fmcw):
+            transceptor_configs.append(self.trans_dd_emisor_selected.get())
+            
+        self.transceptor_configs = transceptor_configs
+
+        print(transceptor_configs)
+
     #completar los campos de configuracion del lidar
     def set_lidar_config(self,lidar_config,lidar_models):
         for i,input in enumerate(self.lidar_config_inputs):
@@ -267,7 +293,12 @@ class ConfigGui:
         texto.grid(row=fila_actual,column=columna_inicial)
         self.create_multiple_choice_horizontal(ventana_config_lidar,fila_actual,columna_inicial, \
                                                   self.architecture_texts,self.architecture_selected)
-        fila_actual += 2
+
+        fila_actual += 1
+        
+        boton_configs_datos = tk.Button(ventana_config_lidar, text="Configurar Transceptor", command=self.crear_ventana_config_transceptor)
+        boton_configs_datos.grid(row=fila_actual, column=columna_inicial)
+        fila_actual += 1
 
         #Campos para funcion de limites de reflectance
         #fila_actual = self.create_text_boxs(ventana_config_lidar,fila_actual,columna_inicial,self.lidar_limit_coeff_texts,self.lidar_limit_coeff_inputs)
@@ -308,6 +339,29 @@ class ConfigGui:
         #self.set_lidar_config(self.HDL_64e_config,self.HDL_64e_models,self.HDL_64e_limit_coeff)
 
         ventana_config_datos.mainloop()
+
+    def crear_ventana_config_transceptor(self):
+        ventana_config_transceptor = tk.Toplevel()
+        ventana_config_transceptor.title('Configuración Transceptor - Fundación Fulgor')
+        #crear los campos de texto para configurar el lidar
+        fila_actual = 0
+        columna_inicial = 0
+
+        #OPCIONES A CONFIGURAR
+        texto = tk.Label(ventana_config_transceptor, text='Configuración Emisor:')
+        texto.grid(row=fila_actual,column=columna_inicial)
+        fila_actual+=1
+        print(self.architecture_selected.get())
+        if (self.architecture_selected.get() == 'DC FMCW'):
+            fila_actual = self.create_text_boxs(ventana_config_transceptor,fila_actual,columna_inicial,self.trans_fmcw_emisor_objects_texts,self.trans_emisor_objects_inputs,self.trans_fmcw_emisor_objects_default_values)
+        else:
+            fila_actual = self.create_text_boxs(ventana_config_transceptor,fila_actual,columna_inicial,self.trans_dd_emisor_objects_texts,self.trans_emisor_objects_inputs,self.trans_dd_emisor_objects_default_values)
+
+
+        boton_save_config_transceptor = tk.Button(ventana_config_transceptor, text="Confirmar configuracion", command=self.boton_config_transceptor)
+        boton_save_config_transceptor.grid(row=fila_actual, column=columna_inicial)
+
+        ventana_config_transceptor.mainloop()
 
     def split_lidar_config(self,config):
         lidar_configs = []
