@@ -27,7 +27,7 @@ class ConfigGui:
         self.data_output_type_selected = tk.StringVar(value="KITTI")
 
         # Interfaz General LiDAR
-        self.lidar_configs_texts = ['Lambda [m]', 'FOV Vertical superior: ', 'FOV Vertical inferior: ', 'Canales: ', 'Rango: ', 'Frecuencia', 'FOV Horizonal', 'FOV Horizontal Step' ]
+        self.lidar_configs_texts = ['Lambda [m]', 'FOV Vertical superior: ', 'FOV Vertical inferior: ', 'Canales: ', 'Rango[m]: ', 'Frecuencia[Hz]', 'FOV Horizonal']
         self.lidar_config_inputs = []
         
         self.lidar_models_texts = ['Modelado de Reflexión', 'Modelado Climatico', 'Modelado Transceptor']
@@ -40,7 +40,7 @@ class ConfigGui:
         self.architecture_selected = tk.StringVar(value="DD Pulsada")
         
         #configuracion LiDAR por defecto
-        self.HDL_64e_config = ['2.0', '-24.8', '64', '120.0']
+        self.HDL_64e_config = ['905e-9','15.0', '-15.0', '16', '100.0','5','360']
         self.HDL_64e_models = [True,True,False] 
 
         ## Emisor LiDAR
@@ -51,8 +51,8 @@ class ConfigGui:
         self.trans_dd_emisor_objects_default_values = ['50e-3','5e-9','2e9','5']
         self.trans_emisor_objects_inputs = []
 
-        self.trans_dd_emisor_texts = ["Rectangular", "Gaussiano"]
-        self.trans_dd_emisor_selected = tk.StringVar(value="Gaussiano")
+        self.trans_dd_emisor_texts = ["Rectangular", "Gaussiana"]
+        self.trans_dd_emisor_selected = tk.StringVar(value="Gaussiana")
 
         ## Receptor LiDAR
         self.trans_fmcw_receptor_objects_texts = ['PRX: ','RPD: ', 'FS: ', 'NOS']
@@ -167,6 +167,10 @@ class ConfigGui:
         for input in self.lidar_models_selected:
             lidar_models.append(input.get())
         self.lidar_models = lidar_models
+
+        self.lidar_models.append(self.lidar_beam_type_selected.get())
+        self.lidar_models.append(self.architecture_selected.get())
+
 
         print(self.lidar_configs)
         print(self.lidar_models)

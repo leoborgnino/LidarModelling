@@ -30,38 +30,65 @@ def generate_lidar_bp(blueprint_library,delta,ang_inc,material,reflectance_limit
 
 def generate_lidar_bp_by_gui(blueprint_library,delta,lidar_all_configs):
     lidar_bp = blueprint_library.find('sensor.lidar.ray_cast_time_resolved')
-    lidar_bp.set_attribute('upper_fov', lidar_all_configs[0])
-    lidar_bp.set_attribute('lower_fov', lidar_all_configs[1])
-    lidar_bp.set_attribute('channels', lidar_all_configs[2])
-    lidar_bp.set_attribute('range', lidar_all_configs[3])
-    lidar_bp.set_attribute('rotation_frequency', str(1.0 / delta))
-    lidar_bp.set_attribute('points_per_second', str(int(lidar_all_configs[4])/delta))
-    lidar_bp.set_attribute('noise_stddev', lidar_all_configs[5])
-    #lidar_bp.set_attribute('noise_stddev_intensity',lidar_all_configs[6])
-    lidar_bp.set_attribute('atmosphere_attenuation_rate',lidar_all_configs[7])
-    lidar_bp.set_attribute('dropoff_general_rate', lidar_all_configs[8])
-    lidar_bp.set_attribute('dropoff_intensity_limit', lidar_all_configs[9])
-    lidar_bp.set_attribute('dropoff_zero_intensity',lidar_all_configs[10])
-    lidar_bp.set_attribute('tx_fs',str(30000000));
+    #FALTA LAMBDA
+    lidar_bp.set_attribute('lambda_laser', lidar_all_configs[0])
+    lidar_bp.set_attribute('upper_fov', lidar_all_configs[1])
+    lidar_bp.set_attribute('lower_fov', lidar_all_configs[2])
+    lidar_bp.set_attribute('channels', lidar_all_configs[3])
+    lidar_bp.set_attribute('range', lidar_all_configs[4])
+    lidar_bp.set_attribute('rotation_frequency', lidar_all_configs[5]) 
+    lidar_bp.set_attribute('horizontal_fov', lidar_all_configs[6])
+    lidar_bp.set_attribute('points_per_second', str(int(lidar_all_configs[6])*int(lidar_all_configs[3])*int(lidar_all_configs[5])))
+    if(lidar_all_configs[7]):
+        lidar_bp.set_attribute('model_intensity', 'true')
+    if(lidar_all_configs[8]):
+        lidar_bp.set_attribute('model_weather', 'true')
+    if(lidar_all_configs[9]):
+        print("MODEL TRANSCEPTOR")
+        lidar_bp.set_attribute('model_transceptor', 'true')
+    
+    if (lidar_all_configs[10] == 'Puntual'): 
+        lidar_bp.set_attribute('beam_divergence', str(0) )
+    elif (lidar_all_configs[10] == 'Gaussiana'):
+        lidar_bp.set_attribute('beam_divergence', str(1) )
+    else:
+        lidar_bp.set_attribute('beam_divergence', str(2) )
+    
+    if (lidar_all_configs[11] == 'DD Pulsada'):
+        lidar_bp.set_attribute('transceptor_arch', str(0) ) 
+    else:
+        lidar_bp.set_attribute('transceptor_arch', str(1) )
+
+    ### TRANSCEPTOR
     lidar_bp.set_attribute('debug_global',"false")
     #lidar_bp.set_attribute('debug_rx',"true")
     lidar_bp.set_attribute('log_rx',"false")
+
+    lidar_bp.set_attribute("power_tx", lidar_all_configs[12]);
+    if (lidar_all_configs[11] == 'DD Pulsada'):
+        lidar_bp.set_attribute("tau_signal", lidar_all_configs[13]);
+        lidar_bp.set_attribute("tx_fs", lidar_all_configs[14]);
+        lidar_bp.set_attribute("tx_nos", lidar_all_configs[15]);
+        lidar_bp.set_attribute("tx_pulse_shape", str((lidar_all_configs[16] =='Rectangular')));
+        lidar_bp.set_attribute("ch_fs", lidar_all_configs[14]);
+        lidar_bp.set_attribute("ch_nos", lidar_all_configs[15]);
+    else:
+        lidar_bp.set_attribute("tx_f_bw", lidar_all_configs[13]);
+        lidar_bp.set_attribute("tx_f_min", lidar_all_configs[14]);
+        lidar_bp.set_attribute("tx_fs", lidar_all_configs[15]);
+        lidar_bp.set_attribute("tx_nos", lidar_all_configs[16]);
+        lidar_bp.set_attribute("ch_fs", lidar_all_configs[15]);
+        lidar_bp.set_attribute("ch_nos", lidar_all_configs[16]);
+
+    lidar_bp.set_attribute("power_rx", lidar_all_configs[17]);
+    lidar_bp.set_attribute("rpd_rx", lidar_all_configs[18]);
+    lidar_bp.set_attribute("rx_fs", lidar_all_configs[19]);
+    lidar_bp.set_attribute("rx_nos", lidar_all_configs[20]);
     #lidar_bp.set_attribute('sensor_tick', str(0.1)) #si es el doble q delta, va a dar un dato cada 2 ticks
-    if(lidar_all_configs[11]):
-        lidar_bp.set_attribute('model_angle', 'true')
-        lidar_bp.set_attribute('model_intensity', 'true')
-    if(lidar_all_configs[12]):
-        lidar_bp.set_attribute('model_material', 'true')
-        lidar_bp.set_attribute('model_intensity', 'true')
-    if(lidar_all_configs[14]):
-        print("MODEL TRANSCEPTOR")
-        lidar_bp.set_attribute('model_transceptor', 'true')
-    if(lidar_all_configs[15]):
-        lidar_bp.set_attribute('log_rx', 'true')
-    #if(lidar_all_configs[13]):
-    #    lidar_bp.set_attribute('model_reflectance_limits_function', 'true')
-    #    lidar_bp.set_attribute('reflectance_limits_function_coeff_a', lidar_all_configs[14])
-    #    lidar_bp.set_attribute('reflectance_limits_function_coeff_b', lidar_all_configs[15])
+    lidar_bp.set_attribute('model_reflectance_limits_function', 'true')
+    lidar_bp.set_attribute('reflectance_limits_function_coeff_a', str(0.0005))
+    lidar_bp.set_attribute('reflectance_limits_function_coeff_b', str(0.000054))
+
     return lidar_bp
 
 
