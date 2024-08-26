@@ -124,9 +124,9 @@ def run_data_collect(map,client,images_path,pointclouds_path,pointclouds_carla_p
         #LIDAR HDL-64E - CARLA model
         if(model_carla_lidar):
             lidar_all_configs_carla = lidar_all_configs
-            lidar_all_configs_carla[11] = False
-            lidar_all_configs_carla[12] = False
-            lidar_all_configs_carla[13] = False
+            lidar_all_configs_carla[8] = False
+            lidar_all_configs_carla[9] = False
+            lidar_all_configs_carla[10] = False
 
             lidar_carla_bp = generate_lidar_bp_by_gui(blueprint_library,delta,lidar_all_configs)
 
