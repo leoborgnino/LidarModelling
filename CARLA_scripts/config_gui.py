@@ -45,10 +45,10 @@ class ConfigGui:
 
         ## Emisor LiDAR
         self.trans_fmcw_emisor_objects_texts = ['PTX: ','F_BW: ', 'F_MIN: ', 'FS:', 'NOS']
-        self.trans_fmcw_emisor_objects_default_values = ['50e-3','1e9','0','2e9','5']
+        self.trans_fmcw_emisor_objects_default_values = ['50e-3','1e9','0','2e9','2']
 
         self.trans_dd_emisor_objects_texts = ['PTX: ','TAU_SIGNAL: ', 'FS:', 'NOS']
-        self.trans_dd_emisor_objects_default_values = ['50e-3','5e-9','2e9','5']
+        self.trans_dd_emisor_objects_default_values = ['50e-3','5e-9','2e9','2']
         self.trans_emisor_objects_inputs = []
 
         self.trans_dd_emisor_texts = ["Rectangular", "Gaussiana"]
@@ -56,7 +56,7 @@ class ConfigGui:
 
         ## Receptor LiDAR
         self.trans_fmcw_receptor_objects_texts = ['PRX: ','RPD: ', 'FS: ', 'NOS']
-        self.trans_fmcw_receptor_objects_default_values = ['1','0.8','2e9','5']
+        self.trans_fmcw_receptor_objects_default_values = ['1','0.8','2e9','2']
         self.trans_fmcw_receptor_objects_inputs = []
         
         #configuraciones almacenadas
