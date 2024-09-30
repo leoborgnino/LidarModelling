@@ -58,7 +58,7 @@
         },
         {
             "name": "NoMaterial",
-            "reflectivity": 0.10
+            "reflectivity": 0.5
         }
     ]
 }

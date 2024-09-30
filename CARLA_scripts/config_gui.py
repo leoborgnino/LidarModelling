@@ -8,8 +8,8 @@ class ConfigGui:
     def __init__(self):
         self.ventana = tk.Tk()
         # Interfaz Principal
-        self.sim_maps_texts = ["Town01", "Town02", "Town03", "Town04","Town05","Town06","Town07","Town10","Town11","Town12"]
-        self.sim_map_selected = tk.StringVar(value="Town01")
+        self.sim_maps_texts = ["Town01", "Town02", "Town03", "Town04","Town05","Town06","Town07","Town10","Town11","Town12", "Custom"]
+        self.sim_map_selected = tk.StringVar(value="Custom")
 
         self.sim_clima_texts = ["Soleado", "Niebla", "Lluvia"]
         self.sim_clima_selected = tk.StringVar(value="Soleado")
@@ -19,8 +19,8 @@ class ConfigGui:
         self.sim_objects_inputs = []
 
         # Interfaz Configuracion Base de Datos
-        self.sim_configs_texts = ['Cantidad de datos: ','Datos por segundo: ']
-        self.sim_config_default_values = ['20','1']
+        self.sim_configs_texts = ['Cantidad de datos: ','Segundos por dato: ']
+        self.sim_config_default_values = ['2','1']
         self.sim_config_inputs = []
 
         self.data_output_type_texts = ["KITTI","RX RT","RX REF","PCD"]
@@ -40,15 +40,15 @@ class ConfigGui:
         self.architecture_selected = tk.StringVar(value="DD Pulsada")
         
         #configuracion LiDAR por defecto
-        self.HDL_64e_config = ['905e-9','15.0', '-15.0', '16', '100.0','5','360']
-        self.HDL_64e_models = [True,True,False] 
+        self.HDL_64e_config = ['905e-9','15.0', '-15.0', '16', '10.0','10','360']#['905e-9','15.0', '-15.0', '16', '10.0','5','90']
+        self.HDL_64e_models = [True,False,True] 
 
         ## Emisor LiDAR
         self.trans_fmcw_emisor_objects_texts = ['PTX: ','F_BW: ', 'F_MIN: ', 'FS:', 'NOS']
-        self.trans_fmcw_emisor_objects_default_values = ['50e-3','1e9','0','2e9','2']
+        self.trans_fmcw_emisor_objects_default_values = ['50e-3','2e9','0','2e9','1']
 
         self.trans_dd_emisor_objects_texts = ['PTX: ','TAU_SIGNAL: ', 'FS:', 'NOS']
-        self.trans_dd_emisor_objects_default_values = ['50e-3','5e-9','2e9','2']
+        self.trans_dd_emisor_objects_default_values = ['50e-3','5e-9','2e9','1']
         self.trans_emisor_objects_inputs = []
 
         self.trans_dd_emisor_texts = ["Rectangular", "Gaussiana"]
@@ -56,7 +56,7 @@ class ConfigGui:
 
         ## Receptor LiDAR
         self.trans_fmcw_receptor_objects_texts = ['PRX: ','RPD: ', 'FS: ', 'NOS']
-        self.trans_fmcw_receptor_objects_default_values = ['1','0.8','2e9','2']
+        self.trans_fmcw_receptor_objects_default_values = ['1','0.01','2e9','1']
         self.trans_fmcw_receptor_objects_inputs = []
         
         #configuraciones almacenadas
@@ -98,7 +98,7 @@ class ConfigGui:
 
         for j in range(columns):
             fila_actual = fila_inicial
-            for i, opcion in enumerate(texts[j*int(len(texts)/columns):(j+1)*int(len(texts)/columns)]):
+            for i, opcion in enumerate(texts[j*int(round(len(texts)/columns)):(j+1)*int(round(len(texts)/columns))]):
                 radiobutton = tk.Radiobutton(ventana, text=opcion, variable=saved_option, value=opcion, padx=0, pady=0)
                 radiobutton.grid(row=fila_actual, column=columna_inicial+1+j,padx=0, pady=0)
                 fila_actual += 1
@@ -429,7 +429,7 @@ class ConfigGui:
         texto.grid(row=fila_actual,column=columna_inicial)
 
         fila_actual = self.create_multiple_choice_vertical(self.ventana,fila_actual,columna_inicial, \
-                                                  self.sim_maps_texts,self.sim_map_selected, 2)
+                                                  self.sim_maps_texts,self.sim_map_selected, 3)
 
         #SELECCION DE CLIMA
         texto = tk.Label(self.ventana, text='Clima:')

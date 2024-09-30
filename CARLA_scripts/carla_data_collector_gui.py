@@ -16,13 +16,13 @@ import logging
 import math
 import json
 
-#try:
-#    sys.path.append(glob.glob('../carla/dist/carla-*%d.%d-%s.egg' % (
-#        sys.version_info.major,
-#        sys.version_info.minor,
-#        'win-amd64' if os.name == 'nt' else 'linux-x86_64'))[0])
-#except IndexError:
-#    pass
+try:
+    sys.path.append(glob.glob('../carla/dist/carla-*%d.%d-%s.egg' % (
+        sys.version_info.major,
+        sys.version_info.minor,
+        'win-amd64' if os.name == 'nt' else 'linux-x86_64'))[0])
+except IndexError:
+    pass
 
 import carla
 
@@ -96,21 +96,26 @@ def run_data_collect(map,client,images_path,pointclouds_path,pointclouds_carla_p
         with open(log_file_path, 'a') as log_file:
             log_file.write('MAPA: '+map + ' \n')
 
-        world = client.load_world(map)
+
+        if map == 'Custom':
+            world = client.get_world()
+        else:
+            world = client.load_world(map)
+            #traffic manager
+            traffic_manager = client.get_trafficmanager(8000)
+            traffic_manager.set_synchronous_mode(True)
+            traffic_manager.set_global_distance_to_leading_vehicle(2.5) #distancia a mantener entre vehiculos
+            #traffic_manager.set_hybrid_physics_mode(True) #desactiva las fisicas de los vehiculos lejanos al vehiculo hero, reduce el computo
+            #traffic_manager.set_hybrid_physics_radius(45.0) #dentro de este radio, si se calculan las fisicas
+            traffic_manager.global_percentage_speed_difference(80)
+        #delta = 0.05
+
         #world = client.get_world()
 
         #Setea modo sincrono en la simulacion con delta fijo
         original_settings = world.get_settings()
         settings = world.get_settings()
 
-        #traffic manager
-        traffic_manager = client.get_trafficmanager(8000)
-        traffic_manager.set_synchronous_mode(True)
-        traffic_manager.set_global_distance_to_leading_vehicle(2.5) #distancia a mantener entre vehiculos
-        #traffic_manager.set_hybrid_physics_mode(True) #desactiva las fisicas de los vehiculos lejanos al vehiculo hero, reduce el computo
-        #traffic_manager.set_hybrid_physics_radius(45.0) #dentro de este radio, si se calculan las fisicas
-        traffic_manager.global_percentage_speed_difference(80)
-        #delta = 0.05
         delta = 0.1 #Determina los hz del sensor, 0.1 serian 10hz
         settings.fixed_delta_seconds = delta
         settings.synchronous_mode = True
@@ -133,40 +138,56 @@ def run_data_collect(map,client,images_path,pointclouds_path,pointclouds_carla_p
         #Crea la camara RGB
         camera_bp = generate_camera_bp(blueprint_library)
 
-        #Crea vehiculo sobre el cual montar los sensores
-        vehicle_bp = blueprint_library.filter("vehicle.seat.leon")[0]
-        vehicle_bp.set_attribute('role_name', 'hero')
-        #vehicle_bp.set_attribute('role_name', 'autopilot')
+        # Spawn and mount lidar
 
-        #Spawnear vehiculo y sensores
-        spawn_points = world.get_map().get_spawn_points()
-        sp_vehicle = random.choice(range(0,len(spawn_points)))
-        #sp_vehicle = 0
+        if map != 'Custom':
+            #Crea vehiculo sobre el cual montar los sensores
+            vehicle_bp = blueprint_library.filter("vehicle.seat.leon")[0]
+            vehicle_bp.set_attribute('role_name', 'hero')
+            #vehicle_bp.set_attribute('role_name', 'autopilot')
 
-        vehicle_transform = world.get_map().get_spawn_points()[sp_vehicle]
-        vehicle = world.spawn_actor(
-            blueprint=vehicle_bp,
-            transform=vehicle_transform)
-        vehicle.set_autopilot(True,traffic_manager.get_port())
+            #Spawnear vehiculo y sensores
+            spawn_points = world.get_map().get_spawn_points()
+            sp_vehicle = random.choice(range(0,len(spawn_points)))
+            #sp_vehicle = 0
 
-        #las coordenadas son relativas al vehiculo
-        #x es el eje correspondiente a la direccion del auto, positivo seria hacia adelante
-        #z es la altura
-        camera = world.spawn_actor(blueprint=camera_bp,
+            vehicle_transform = world.get_map().get_spawn_points()[sp_vehicle]
+            vehicle = world.spawn_actor(
+                blueprint=vehicle_bp,
+                transform=vehicle_transform)
+            vehicle.set_autopilot(True,traffic_manager.get_port())
+
+            camera = world.spawn_actor(blueprint=camera_bp,
             transform=carla.Transform(carla.Location(x=0.0,y=-0.06, z=1.65)), #posicion segun Kitti 
             attach_to=vehicle)
-        cnt_debug = 0
+            cnt_debug = 0
 
-        lidar = world.spawn_actor(
-            blueprint=lidar_bp,
-            transform=carla.Transform(carla.Location(x=-0.27, z=1.73)), #posicion segun Kitti
-            attach_to=vehicle)
+            lidar = world.spawn_actor(
+                blueprint=lidar_bp,
+                transform=carla.Transform(carla.Location(x=-0.27, z=1.73)), #posicion segun Kitti
+                attach_to=vehicle)
 
-        if(model_carla_lidar):
-            carla_lidar = world.spawn_actor(
-            blueprint=lidar_carla_bp,
-            transform=carla.Transform(carla.Location(x=-0.27, z=1.73)), #posicion segun Kitti
-            attach_to=vehicle)
+            if(model_carla_lidar):
+                carla_lidar = world.spawn_actor(
+                blueprint=lidar_carla_bp,
+                transform=carla.Transform(carla.Location(x=-0.27, z=1.73)), #posicion segun Kitti
+                attach_to=vehicle)
+        else:
+            #las coordenadas son relativas al vehiculo
+            #x es el eje correspondiente a la direccion del auto, positivo seria hacia adelante
+            #z es la altura
+            camera = world.spawn_actor(blueprint=camera_bp,
+                transform=carla.Transform(carla.Location(x=0.0, y=0.475, z=0.42)))
+            cnt_debug = 0
+
+            lidar = world.spawn_actor(
+                blueprint=lidar_bp,
+                transform=carla.Transform(carla.Location(x=0.0, y=0.475, z=0.42), carla.Rotation(0.0,0,180)))
+
+            if(model_carla_lidar):
+                carla_lidar = world.spawn_actor(
+                blueprint=lidar_carla_bp,
+                transform=carla.Transform(carla.Location(x=0.0, z=0.42)))
 
         #CAMBIOS FAVORABLES - UBICACION LIDAR Y VELOCIDAD REDUCIDA
         #Funciones de callback para almacenar imagen y nube de puntos
@@ -183,58 +204,59 @@ def run_data_collect(map,client,images_path,pointclouds_path,pointclouds_carla_p
         print("Lidar Spawned")
 
         #spawnear trafico 
-        list_of_cars,list_of_bikes = load_list_of_vehicles()
+        if (map != "Custom"):
+            list_of_cars,list_of_bikes = load_list_of_vehicles()
 
-        cars_bp = blueprint_library.filter('vehicle.*') #blueprints de todos los vehiculos
-        cars_bp = [x for x in cars_bp if x.id.endswith(tuple(list_of_cars)) ]
+            cars_bp = blueprint_library.filter('vehicle.*') #blueprints de todos los vehiculos
+            cars_bp = [x for x in cars_bp if x.id.endswith(tuple(list_of_cars)) ]
 
-        bikes_bp = blueprint_library.filter('vehicle.*') #blueprints de todos los vehiculos
-        bikes_bp = [x for x in bikes_bp if x.id.endswith(tuple(list_of_bikes)) ]
-        
-        cars_bp = sorted(cars_bp, key=lambda bp: bp.id)
-        spawn_points.pop(sp_vehicle) #se quita el punto en el que se spawnea el vehivulo con los sensores
-        
-        print('SpawnPoints disponibles: {}'.format(len(spawn_points)))
-        random.shuffle(spawn_points) #mezclar 
+            bikes_bp = blueprint_library.filter('vehicle.*') #blueprints de todos los vehiculos
+            bikes_bp = [x for x in bikes_bp if x.id.endswith(tuple(list_of_bikes)) ]
+            
+            cars_bp = sorted(cars_bp, key=lambda bp: bp.id)
+            spawn_points.pop(sp_vehicle) #se quita el punto en el que se spawnea el vehivulo con los sensores
+            
+            print('SpawnPoints disponibles: {}'.format(len(spawn_points)))
+            random.shuffle(spawn_points) #mezclar 
 
-        percentaje_cars = percentages_objects[0]/100
-        percentaje_bikes = percentages_objects[1]/100
-        percentage_of_walkers = percentages_objects[2]/100
+            percentaje_cars = percentages_objects[0]/100
+            percentaje_bikes = percentages_objects[1]/100
+            percentage_of_walkers = percentages_objects[2]/100
 
-        number_of_cars = int(len(spawn_points) * percentaje_cars)
-        number_of_bikes = int(len(spawn_points) * percentaje_bikes)
+            number_of_cars = int(len(spawn_points) * percentaje_cars)
+            number_of_bikes = int(len(spawn_points) * percentaje_bikes)
 
-        lost_of_spawn = 0.4 
-        percentage_of_walkers_final = percentage_of_walkers / (1.0-lost_of_spawn)
-        number_of_walkers = int(number_of_cars * percentage_of_walkers_final)
+            lost_of_spawn = 0.4 
+            percentage_of_walkers_final = percentage_of_walkers / (1.0-lost_of_spawn)
+            number_of_walkers = int(number_of_cars * percentage_of_walkers_final)
 
-        cars_spawn_points = []
-        bikes_spawn_points = []
+            cars_spawn_points = []
+            bikes_spawn_points = []
 
-        for i in range(number_of_cars):
-            spawn_point_selected = random.choice(spawn_points)
-            cars_spawn_points.append(spawn_point_selected)
-            spawn_points.remove(spawn_point_selected)
-         
-        bikes_spawn_points = spawn_points
-        
-        cars_list = spawn_vehicles(cars_spawn_points, number_of_cars, cars_bp, traffic_manager,client)
-        print('Cantidad de autos: {}'.format(len(cars_list)))
+            for i in range(number_of_cars):
+                spawn_point_selected = random.choice(spawn_points)
+                cars_spawn_points.append(spawn_point_selected)
+                spawn_points.remove(spawn_point_selected)
+            
+            bikes_spawn_points = spawn_points
+            
+            cars_list = spawn_vehicles(cars_spawn_points, number_of_cars, cars_bp, traffic_manager,client)
+            print('Cantidad de autos: {}'.format(len(cars_list)))
 
-        bikes_list = spawn_vehicles(bikes_spawn_points, number_of_bikes, bikes_bp, traffic_manager,client)
-        print('Cantidad de ciclistas: {}'.format(len(bikes_list)))
+            bikes_list = spawn_vehicles(bikes_spawn_points, number_of_bikes, bikes_bp, traffic_manager,client)
+            print('Cantidad de ciclistas: {}'.format(len(bikes_list)))
 
-        pedestrians_bp = blueprint_library.filter('walker.pedestrian.*')
-        pedestrians_bp = [x for x in pedestrians_bp if int(x.get_attribute('generation')) == 2]
-        
-        print(number_of_walkers)
-        all_actors, all_id = spawn_pedestrians(0,world,client,number_of_walkers,pedestrians_bp)
-        print('Cantidad de peatones: {}'.format(int(len(all_actors)/2)))
+            pedestrians_bp = blueprint_library.filter('walker.pedestrian.*')
+            pedestrians_bp = [x for x in pedestrians_bp if int(x.get_attribute('generation')) == 2]
+            
+            print(number_of_walkers)
+            all_actors, all_id = spawn_pedestrians(0,world,client,number_of_walkers,pedestrians_bp)
+            print('Cantidad de peatones: {}'.format(int(len(all_actors)/2)))
 
-        with open(log_file_path, 'a') as log_file:
-            log_file.write('Cantidad de autos: {} \n'.format(len(cars_list)))
-            log_file.write('Cantidad de ciclistas: {} \n'.format(len(bikes_list)))
-            log_file.write('Cantidad de peatones: {} \n'.format(int(len(all_actors)/2)))
+            with open(log_file_path, 'a') as log_file:
+                log_file.write('Cantidad de autos: {} \n'.format(len(cars_list)))
+                log_file.write('Cantidad de ciclistas: {} \n'.format(len(bikes_list)))
+                log_file.write('Cantidad de peatones: {} \n'.format(int(len(all_actors)/2)))
 
         #generar los ticks de simulacion necesarios hasta capturar los frames necesarios
         frames = frames_per_map
@@ -261,7 +283,7 @@ def run_data_collect(map,client,images_path,pointclouds_path,pointclouds_carla_p
             world.tick()
             cnt_debug+=1        
             ticks += 1
-            #time.sleep(0.001)
+            time.sleep(10.0)
             world_frame = world.get_snapshot().frame
 
             #tras cada tick, en caso de haber dato disponible, se lo obtiene
@@ -282,9 +304,9 @@ def run_data_collect(map,client,images_path,pointclouds_path,pointclouds_carla_p
                         carla_pointcloud = carla_lidar_queue.get()
             
             frames_between_captures += 1
-            print(world_frame)
-            print(image.frame)
-            print(pointcloud.frame)
+            #print(world_frame)
+            #print(image.frame)
+            #print(pointcloud.frame)
             #cuando se tengan ambos datos (imagen y nube de puntos) de un mismo frame, se almacenan ambos
             if ticks > 1 and (image.frame == pointcloud.frame) and frames_between_captures>=interval_between_frames:
 
@@ -383,22 +405,38 @@ def run_data_collect(map,client,images_path,pointclouds_path,pointclouds_carla_p
     finally:
         print('\n')
         world.apply_settings(original_settings)
-        vehicle.destroy()
-        lidar.destroy()
-        camera.destroy()
+        try:
+            vehicle.destroy()
+        except:
+            print("No existe vehicle")
+        try:
+            lidar.destroy()
+        except:
+            print("No existe lidar")
+        try:
+            camera.destroy()
+        except:
+            print("No existe camera")
         if(model_carla_lidar):
-            carla_lidar.destroy()
+            try:
+                carla_lidar.destroy()
+            except:
+                print("No existe carla lidar")
+
         #cv2.destroyAllWindows()
+        try:
+            client.apply_batch([carla.command.DestroyActor(x) for x in cars_list])
+            client.apply_batch([carla.command.DestroyActor(x) for x in bikes_list])
 
-        client.apply_batch([carla.command.DestroyActor(x) for x in cars_list])
-        client.apply_batch([carla.command.DestroyActor(x) for x in bikes_list])
 
+            # stop walker controllers (list is [controller, actor, controller, actor ...])
+            for i in range(0, len(all_id), 2):
+                all_actors[i].stop()
 
-        # stop walker controllers (list is [controller, actor, controller, actor ...])
-        for i in range(0, len(all_id), 2):
-            all_actors[i].stop()
-
-        client.apply_batch([carla.command.DestroyActor(x) for x in all_id])
+            client.apply_batch([carla.command.DestroyActor(x) for x in all_id])
+        except:
+            pass
+        
         time.sleep(0.5)
 
 def main(arg):
@@ -419,7 +457,7 @@ def main(arg):
     """Spawnea el LIDAR HDL-64E y una camara RGB en un vehiculo, y genera un paso de simulacion"""
     #Cliente y simulador
     client = carla.Client('localhost', 2000)
-    client.set_timeout(30.0)
+    client.set_timeout(1000.0)
     
     #Crear directorios para guardar los datos, nubes de puntos, imagenes y labels
     model_carla_lidar = False #para instanciar un segundo lidar que utilize el modelo por defecto de carla
