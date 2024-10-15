@@ -2,6 +2,7 @@ import carla
 import random
 import logging
 import numpy as np
+import open3d as o3d
 
 def generate_lidar_bp(blueprint_library,delta,ang_inc,material,reflectance_limit):
     lidar_bp = blueprint_library.find('sensor.lidar.ray_cast')
@@ -12,7 +13,7 @@ def generate_lidar_bp(blueprint_library,delta,ang_inc,material,reflectance_limit
     lidar_bp.set_attribute('rotation_frequency', str(1.0 / delta))
     lidar_bp.set_attribute('points_per_second', str(1333330))
     lidar_bp.set_attribute('noise_stddev', str(0.015))
-    lidar_bp.set_attribute('dropoff_general_rate',str(0.05))
+    lidar_bp.set_attribute('dropoff_general_rate',str(0.0))
     lidar_bp.set_attribute('dropoff_intensity_limit',str(0.0))
     lidar_bp.set_attribute('dropoff_zero_intensity',str(0.0))
     #lidar_bp.set_attribute('sensor_tick', str(0.1)) #si es el doble q delta, va a dar un dato cada 2 ticks
@@ -46,6 +47,8 @@ def generate_lidar_bp_by_gui(blueprint_library,delta,lidar_all_configs):
     if(lidar_all_configs[9]):
         print("MODEL TRANSCEPTOR")
         lidar_bp.set_attribute('model_transceptor', 'true')
+    else:
+        lidar_bp.set_attribute('model_transceptor', 'false')
     
     if (lidar_all_configs[10] == 'Puntual'): 
         lidar_bp.set_attribute('beam_divergence', str(0) )
@@ -87,6 +90,7 @@ def generate_lidar_bp_by_gui(blueprint_library,delta,lidar_all_configs):
     #lidar_bp.set_attribute('sensor_tick', str(0.1)) #si es el doble q delta, va a dar un dato cada 2 ticks
     lidar_bp.set_attribute('model_reflectance_limits_function', 'true')
     lidar_bp.set_attribute('reflectance_limits_function_coeff_a', str(0.0005))
+    lidar_bp.set_attribute('reflectance_limits_function_coeff_b', str(0.000054))
     lidar_bp.set_attribute('reflectance_limits_function_coeff_b', str(0.000054))
 
     return lidar_bp
@@ -135,37 +139,86 @@ def save_image(images_path, image_data,frame):
     #print('imagen %.6d.bin guardada' % image_data.frame)
 
 def save_pointcloud(pointclouds_path,pointcloud,frame):
-    print(pointcloud.raw_data)
-    print(pointcloud.raw_data.shape)
+    # print("RAW DATA:")
+    # print(pointcloud.raw_data[0:100])
+    print("DATA RAW SHAPE: ", pointcloud.raw_data.shape)
 
     data = np.copy(np.frombuffer(pointcloud.raw_data, dtype=np.dtype('f4')))
 
     total_points = 0
     for i in range(pointcloud.channels):
+        #print("Channel ",i, " Count ", pointcloud.get_point_count(i))
         total_points += pointcloud.get_point_count(i)
-        #print(point_cloud.get_point_count(i))
 
+    print("Total Points: ", total_points)
     points = data[0:total_points*4]
-    time_resolved_signals = data[total_points*4::]
+    time_resolved_signals = data[(total_points*4)::]
+
+    # print("Point Cloud")
+    # POINTS_N = 10
+    # for i in range(len(points[0:POINTS_N*4])):
+    #     print("x: ", points[i*4])
+    #     print("y: ", points[(i+1)*4])
+    #     print("z: ", points[(i+2)*4])
+    #     print("i: ", points[(i+3)*4])
+
+    # print("Time Resolved")
+    # POINTS_N = 10
+    # for i in range(len(time_resolved_signals[0:POINTS_N*2])):
+    #     print("t1: ", time_resolved_signals[i*2])
+    #     print("t2: ", time_resolved_signals[(i+1)*2])
 
     data = np.reshape(points, (int(points.shape[0] / 4), 4))
 
-    len_signal = int(len(time_resolved_signals)/(total_points))
+    #print(min(data[:,1]))
     #print(len_signal)
-    data2 = np.reshape(time_resolved_signals, (int(time_resolved_signals.shape[0] /  len_signal ), len_signal))
-
     #print(data)
     #print(data2)
 
-    np.savetxt('./logs/time_signal.txt', data2, delimiter=" ", fmt="%s")
+    len_signal = int(len(time_resolved_signals)/(total_points))
+    print(total_points)
+    print(len(time_resolved_signals))
+    print(len_signal)
+    print(len(time_resolved_signals)/(total_points))
+    if(len_signal != 0):
+        data2 = np.reshape(time_resolved_signals[0:len_signal*int( time_resolved_signals.shape[0] /  len_signal )], (int( time_resolved_signals.shape[0] /  len_signal ), len_signal))
+        np.savetxt('./logs/time_signal.txt', data2, delimiter=" ", fmt="%s")
 
     #UNREAL Y EL LIDAR INTERNO UTILIZA EL SISTEMA X: Foward, Y:Right, Z: Up
     #PERO EL LIDAR EN KITTI UTILIZA X: Foward, Y:Left, Z: Up
     #Por lo que hay que invertir las coordenas y
 
-    data[:,1] = -data[:,1]
+    # Extraemos las coordenadas x, y, z
+    xyz_points = data[:, :3]
+
+    #print(min(xyz_points[:,1]))
+
+    # Creamos un objeto PointCloud
+    pcd = o3d.geometry.PointCloud()
+
+    # Añadimos los puntos (x, y, z) al PointCloud
+    pcd.points = o3d.utility.Vector3dVector(xyz_points)
+
+    points_np = np.asarray(pcd.points)
+    #print(min(points_np[:,1]))
+
+    # Si deseas almacenar la intensidad como un atributo de color o canal adicional, podrías
+    # mapear la intensidad a un valor de color (esto es opcional).
+    # Aquí mapeamos la intensidad al canal de colores (r, g, b), en este caso como escala de grises.
+    intensity = data[:, 3]
+    #print(intensity)
+    colors = np.tile(intensity[:, np.newaxis], (1, 3))  # Escala de grises
+    pcd.colors = o3d.utility.Vector3dVector(colors)
+
+    # Guardamos el archivo .pcd
+    o3d.io.write_point_cloud('./%s/%.6d.pcd' % (pointclouds_path, frame), pcd)
+
+    print("Archivo .pcd guardado exitosamente.")
+
+    data_reshape = np.copy(data)
+    data_reshape[:,1] = -data[:,1]
     pointcloud_path = './%s/%.6d.bin' % (pointclouds_path, frame) 
-    data.tofile(pointcloud_path)
+    data_reshape.tofile(pointcloud_path)
     #print('point cloud %.6d.bin guardada' % lidar_data.frame)
 
 def sensor_callback(data,queue):

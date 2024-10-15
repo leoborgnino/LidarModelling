@@ -54,7 +54,7 @@ def get_label_rotation(label_line):
     return float(label_line[14])
 
 def get_colors_pointcloud(intensity):
-    cmap = cm.get_cmap('plasma')
+    cmap = cm.get_cmap('viridis')
     VIRIDIS = np.array(cmap(np.arange(0,cmap.N)))
 
     VID_RANGE = np.linspace(0.0, 1.0, VIRIDIS.shape[0])
@@ -72,7 +72,7 @@ def get_colors_pointcloud(intensity):
 
 
 #DATA_DIR = '/home/gaston/Documents/Kitti' 
-DATA_DIR = '/media/gaston/HDD-Ubuntu/carla/ScriptsPruebas/scripts/28-03-23_16:57:59/' 
+DATA_DIR = 'D:/CARLA/lidar-systems-level/CARLA_scripts/30-09-24_18_10_22' 
 #DATA_DIR = '/media/gaston/HDD-Ubuntu/carla/ScriptsPruebas/Complex-YOLOv4-Pytorch/dataset/kitti/'
 IMG_DIR = DATA_DIR + '/image_2'
 #LABEL_DIR = DATA_DIR + '/training_filter_minpoints_C2P2C2/label_2'
@@ -82,6 +82,12 @@ POINT_CLOUD_DIR = DATA_DIR + '/training/velodyne'
 CALIB_DIR = DATA_DIR + '/calib'
 
 def main():
+
+    # Crear una ventana de visualización y capturar la imagen
+    vis = o3d.visualization.Visualizer()
+    # Obtener el controlador de vista (ViewControl) del visualizador
+    vis.create_window(visible=False)  # Crear ventana sin mostrarla
+    view_control = vis.get_view_control()
 
     print('Labels directory: ' + LABEL_DIR)
     list_files=os.listdir(LABEL_DIR)
@@ -147,6 +153,9 @@ def main():
 
                 orientation = -(rotation + np.pi/2)
                 location_lidar[2] = location_lidar[2] + dimensions[0]/2
+                location_lidar[0] = location_lidar[0] - 0.5
+                location_lidar[1] = location_lidar[1] - 0.5
+                #print(location_lidar)
                 R = o3d.geometry.get_rotation_matrix_from_xyz(np.asarray([0,0, orientation]))
                 extent = np.array([dimensions[2],dimensions[1],dimensions[0]]) #dimesiones en x,y,z (coordenadas de lidar)
                 center = np.array(location_lidar) #ubicacion del centro en x,y,z (coordenadas de lidar)
@@ -157,7 +166,21 @@ def main():
                 #cant_points_in_bbox.append(cant_points_inside)
                 geometries.append(obb)
 
-        
+        vis.clear_geometries()
+        for geom in geometries:
+            vis.add_geometry(geom)
+        vis.poll_events()
+        vis.update_renderer()
+
+        # Cambiar el ángulo de la cámara usando el controlador de vista
+        view_control.rotate(45, 45)  # Rotar la cámara alrededor del eje Y
+        view_control.set_zoom(20)  # Rotar la cámara alrededor del eje Y
+        vis.poll_events()
+        vis.update_renderer()
+
+        # Capturar la imagen y guardarla
+        vis.capture_screen_image(f"logs/frame_{file_id:03d}.png")
+        vis.destroy_window()  # Cerrar la ventana después de guardar el frame
         o3d.visualization.draw_geometries(geometries)
 
 if __name__ == "__main__":
