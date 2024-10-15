@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt
 import os
+import numpy as np
+plt.style.use('ggplot')
 
 PLOT_TX = True
 PLOT_CHANNEL = True
@@ -25,8 +27,8 @@ for i in plot:
     signals.append(signals_tmp)
 
 for j in range(len(signals)):    
-    plt.figure()
     for i in range(len(signals[1])):
+        plt.figure()
         plt.plot(signals[j][i][-20000:])
-    plt.show()
-    #plt.savefig("debug"+str(j)+".png",dpi=500)
+        plt.savefig("debug"+str(i)+str(j)+".png",dpi=500)
+#plt.show()

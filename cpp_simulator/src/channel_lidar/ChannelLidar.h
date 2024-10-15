@@ -23,9 +23,11 @@
 #include <iostream>
 #include <stdlib.h> 
 #include <ctime>
-#include <cmath>
+#include <math.h>
 #include <map>
 #include <complex>
+#include <random>
+#include <chrono>
 #include <algorithm>
 
 // Includes Propios
@@ -46,6 +48,7 @@ class ChannelLidar
      variables que utiliza. */
   int init(loadSettings *params);
   vector<double> run(vector<double> channel_input, double range, double rho, double angle_inc); 
+  vector<double> run(vector<double> channel_input, vector<double> range, vector<double> rho, double angle_inc); 
   
   // Interfaces
   vector <double> out_channel;

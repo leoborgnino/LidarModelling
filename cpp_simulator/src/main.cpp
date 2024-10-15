@@ -96,7 +96,16 @@ int main ()
   // ::: Procesamiento del Transceptor ::: //
   ///////////////////////////////////////////
 
-  vector<double> ranges{10,30,50,80}; // From Simulator
+  vector<vector<double>> ranges{
+				{20,40,60},
+				{20,40},
+				{20},
+				}; // From Simulator
+  vector<vector<double>> intensities{
+				     {0.1,0.3,0.5,0.8},
+				     {0.1,0.3},
+				     {0.5}
+				     };
 
   for (unsigned int ii = 0; ii<ranges.size(); ii++)
     {
@@ -112,9 +121,9 @@ int main ()
       ///////////////////////////////
       // :::::::: Channel :::::::: //
       ///////////////////////////////
-  
+
       vector<double> output_channel;
-      output_channel = channel_lidar->run(output_tx,ranges[ii],1,0); // Warning Data from Simulator
+      output_channel = channel_lidar->run(output_tx,ranges[ii],intensities[ii],0); // Warning Data from Simulator
       if ( params->getParamAsInt(string("global.LOG_CHANNEL")))
 	logger->logVariable("logs/channel_output"+to_string(ii)+".log",output_channel);
 
@@ -138,7 +147,7 @@ int main ()
 	  cout << "************************" << endl;
 	  cout << "** Resultados Finales **" << endl;
 	  cout << "************************" << endl;
-	  cout << "Distance Expected: " << ranges[ii] << endl;
+	  cout << "Distance Expected: " << ranges[ii][0] << endl;
 	  cout << "Distance Measured: " << distance << endl;
 	  cout << "Power Detected: " << max_value << endl;
 	}

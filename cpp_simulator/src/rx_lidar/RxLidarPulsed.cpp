@@ -51,7 +51,7 @@ vector<double> RxLidarPulsed::run(vector<double> input_rx_from_tx, vector<double
   // Generador random
   unsigned seed = chrono::system_clock::now().time_since_epoch().count();
   const double mean = 0.0;
-  const double stddev = 0.1;
+  const double stddev = 0.002;
   default_random_engine generator(seed);
   normal_distribution<double> dist(mean, stddev);
 
