@@ -98,17 +98,17 @@ int main ()
 
   vector<vector<double>> ranges{
 				{20,40,60},
-				{20,40},
-				{20},
 				}; // From Simulator
   vector<vector<double>> intensities{
-				     {0.1,0.3,0.5,0.8},
-				     {0.1,0.3},
-				     {0.5}
+				     {0.1,0.3,0.5},
 				     };
+
+  cout << ranges.size() << endl;
 
   for (unsigned int ii = 0; ii<ranges.size(); ii++)
     {
+
+      cout << ii << endl;
       ////////////////////////////////
       // :::::::: Tx LiDAR :::::::: //
       ////////////////////////////////

@@ -93,7 +93,7 @@ vector<double> ChannelLidar::run(vector<double> channel_input, vector<double> ra
       // Generador random
       unsigned seed = chrono::system_clock::now().time_since_epoch().count();
       const double mean = 0.0;
-      const double stddev = 0.000000005;
+      const double stddev = 0.00000005;
       default_random_engine generator(seed);
       normal_distribution<double> dist(mean, stddev);
   

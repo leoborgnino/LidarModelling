@@ -98,7 +98,13 @@ int main ()
   // ::: Procesamiento del Transceptor ::: //
   ///////////////////////////////////////////
 
-  vector<double> ranges{10,30,50,80,100}; // From Simulator
+  vector<vector<double>> ranges{
+				{1,2,3},
+				}; // From Simulator
+  vector<vector<double>> intensities{
+				     {0.1,0.1,0.9},
+				     };
+  //vector<double> ranges{10,30,50,80,100}; // From Simulator
   //vector<double> ranges{10}; // From Simulator
 
   for (unsigned int ii = 0; ii<ranges.size(); ii++)
@@ -117,7 +123,7 @@ int main ()
       ///////////////////////////////
   
       vector<double> output_channel;
-      output_channel = channel_lidar->run(output_tx,ranges[ii],1,0); // Warning Data from Simulator
+      output_channel = channel_lidar->run(output_tx,ranges[ii],intensities[ii],0); // Warning Data from Simulator
       if ( params->getParamAsInt(string("global.LOG_CHANNEL")))
 	logger->logVariable("logs/channel_output"+to_string(ii)+".log",output_channel);
 
@@ -148,7 +154,7 @@ int main ()
 	  cout << "Bin de la FFT " << max_idx << endl;
 	  cout << "Frecuencia de la FFT " << frequency_max << endl;
 	  cout << "Frecuencia a Rango " << freq_to_range << endl;
-	  cout << "Distance Expected: " << ranges[ii] << endl;
+	  //cout << "Distance Expected: " << ranges[ii] << endl;
 	  cout << "Distance Measured: " << range_estimated << endl;
 	  cout << "Power Detected: " << max_value << endl;
 	}
